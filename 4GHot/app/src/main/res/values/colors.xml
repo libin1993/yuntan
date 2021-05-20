@@ -156,7 +156,10 @@
     <color name="mediumorchid">#ba55d3</color><!--中粉紫色 -->
 
     <color name="light_green">#5000FF00</color>
-
+    <color name="gray_800">#80000000</color>
+    <color name="gray_ee">#EEEEEE</color>
+    <color name="gray_33">#333333</color>
+    <color name="blue_4d7">#4D7BFF</color>
 
 
 </resources>

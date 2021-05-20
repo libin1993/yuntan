@@ -28,7 +28,7 @@ import com.doit.net.utils.CollideAnalysis;
 import com.doit.net.utils.ToastUtils;
 import com.doit.net.utils.LogUtils;
 import com.doit.net.utils.UtilDelay;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -24,7 +24,7 @@ import com.doit.net.event.EventAdapter;
 import com.doit.net.protocol.LTE_PT_SYSTEM;
 import com.doit.net.utils.Cellular;
 import com.doit.net.utils.ToastUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import java.util.Timer;
 import java.util.TimerTask;

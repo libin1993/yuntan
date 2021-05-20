@@ -18,7 +18,7 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 public class ChangeColorIconWithTextView extends View
 {

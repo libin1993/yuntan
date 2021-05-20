@@ -41,7 +41,7 @@ public class FTPManager {
 
 
     // 连接到ftp服务器
-    public synchronized boolean connect() throws Exception {
+    public synchronized boolean connect(){
         boolean bool = false;
 
         try {

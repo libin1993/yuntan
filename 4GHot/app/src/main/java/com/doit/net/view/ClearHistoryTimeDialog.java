@@ -16,7 +16,7 @@ import com.doit.net.bean.DBUeidInfo;
 import com.doit.net.utils.UCSIDBManager;
 import com.doit.net.utils.DateUtils;
 import com.doit.net.utils.ToastUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.xutils.db.sqlite.WhereBuilder;
 import org.xutils.ex.DbException;

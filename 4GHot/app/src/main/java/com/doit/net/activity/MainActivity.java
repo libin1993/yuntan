@@ -2,8 +2,10 @@ package com.doit.net.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,7 +15,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 
 import android.support.v4.view.ViewPager;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -23,16 +27,23 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.doit.net.BuildConfig;
+import com.doit.net.R;
+import com.doit.net.base.Api;
 import com.doit.net.base.BaseBean;
 import com.doit.net.base.Callback;
 import com.doit.net.base.RxObserver;
 import com.doit.net.base.Transformer;
 import com.doit.net.bean.UserBean;
+import com.doit.net.push.Mpush;
+import com.doit.net.push.RequestUtils;
 import com.doit.net.sockets.OnSocketChangedListener;
 import com.doit.net.sockets.ServerSocketUtils;
 import com.doit.net.sockets.DatagramSocketUtils;
@@ -51,7 +62,6 @@ import com.doit.net.bean.TabEntity;
 import com.doit.net.protocol.LTESendManager;
 import com.doit.net.utils.BlackBoxManger;
 import com.doit.net.event.EventAdapter;
-import com.doit.net.utils.AccountManage;
 import com.doit.net.utils.CacheManager;
 import com.doit.net.utils.FTPManager;
 import com.doit.net.utils.LicenceUtils;
@@ -71,12 +81,13 @@ import com.doit.net.fragment.NameListFragment;
 import com.doit.net.receiver.NetworkChangeReceiver;
 import com.doit.net.fragment.StartPageFragment;
 import com.doit.net.fragment.UeidFragment;
-import com.doit.net.ucsi.R;
 import com.doit.net.utils.ToastUtils;
 import com.flyco.tablayout.CommonTabLayout;
 import com.flyco.tablayout.listener.CustomTabEntity;
 import com.flyco.tablayout.listener.OnTabSelectListener;
+import com.mpush.client.ClientConfig;
 
+import org.apache.poi.ss.formula.functions.T;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -93,9 +104,10 @@ import java.util.TimerTask;
 
 
 import okhttp3.RequestBody;
-
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-import static com.doit.net.activity.SystemSettingActivity.SET_STATIC_IP;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class MainActivity extends BaseActivity implements TextToSpeech.OnInitListener, EventAdapter.EventCall {
     private ViewPager mViewPager;
@@ -143,18 +155,12 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
     private final int BATTERY_STATE = 14;
     private final int HEARTBEAT_RPT = 15;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
-
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) != PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
-            LogUtils.log("没有读取手机权限");
-        }
 
         initView();
         initOtherWork();
@@ -185,6 +191,8 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
             if (CacheManager.deviceState.getDeviceState().equals(DeviceState.WIFI_DISCONNECT)) {
                 //只有从wifi未连接到连接才出现这种状态
                 CacheManager.deviceState.setDeviceState(DeviceState.WAIT_SOCKET);
+
+                initPush();
             }
         } else {
             LogUtils.log("wifi断开连接");
@@ -197,9 +205,8 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
         if (VersionManage.isArmyVer()) {
             return;
         }
-        BlackBoxManger.setCurrentAccount(AccountManage.getCurrentLoginAccount());
         BlackBoxManger.initBlx();
-        BlackBoxManger.recordOperation(BlackBoxManger.LOGIN + AccountManage.getCurrentLoginAccount());
+        BlackBoxManger.recordOperation(BlackBoxManger.LOGIN + SPUtils.getString(SPUtils.USERNAME, ""));
     }
 
     private void initNetWork() {
@@ -267,30 +274,46 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
 
     }
 
-    private void login(){
-        Map<String,Object> map = new HashMap<>();
-        map.put("username","test001");
-        map.put("pwd", "888888");
 
-        RequestBody body= RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), GsonUtils.jsonString(map));
-        RetrofitUtils.getInstance()
-                .getService()
-                .login(body)
-                .compose(Transformer.switchSchedulers())
-                .subscribe(new RxObserver(new Callback<UserBean>() {
+    private String getDeviceId() {
+        TelephonyManager tm = (TelephonyManager) this.getSystemService(Activity.TELEPHONY_SERVICE);
 
-                    @Override
-                    public void onSuccess(UserBean baseBean) {
-                        SPUtils.setToken(baseBean.getData().getToken());
-
-                    }
-
-                    @Override
-                    public void onFail(String msg) {
-                        LogUtils.log(msg);
-                    }
-                }));
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 111);
+        }
+        String deviceId = tm.getDeviceId();
+        if (TextUtils.isEmpty(deviceId)) {
+            String time = Long.toString((System.currentTimeMillis() / (1000 * 60 * 60)));
+            deviceId = time + time;
+        }
+        return deviceId;
     }
+
+    private void initPush() {
+        //公钥有服务端提供和私钥对应
+        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCghPCWCobG8nTD24juwSVataW7iViRxcTkey/B792VZEhuHjQvA3cAJgx2Lv8GnX8NIoShZtoCg3Cx6ecs+VEPD2fBcg2L4JK7xldGpOJ3ONEAyVsLOttXZtNXvyDZRijiErQALMTorcgi79M5uVX9/jMv2Ggb2XAeZhlLD28fHwIDAQAB";
+
+        ClientConfig cc = ClientConfig.build()
+                .setPublicKey(publicKey)
+                .setAllotServer(Api.PUSH_HOST)
+                .setDeviceId(getDeviceId())
+                .setClientVersion(BuildConfig.VERSION_NAME)
+                .setEnableHttpProxy(true)
+                .setUserId(SPUtils.getString(SPUtils.USER_ID, ""));
+        Mpush.showStart.checkInit(this).setClientConfig(cc);
+        if (!Mpush.showStart.hasStarted()) {
+            Mpush.showStart.checkInit(this).startPush();
+            LogUtils.log("启动mpush==userid==" + SPUtils.getString(SPUtils.USER_ID, ""));
+        } else {
+            if (Mpush.showStart.hasRunning()) {
+                Mpush.showStart.stopPush();
+            }
+            Mpush.showStart.checkInit(this).startPush();
+            LogUtils.log("重启mpush==userid==" + SPUtils.getString(SPUtils.USER_ID, ""));
+        }
+
+    }
+
 
     private void initEvent() {
         EventAdapter.register(EventAdapter.FOUND_BLACK_NAME, this);
@@ -345,9 +368,6 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
         textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, null);
     }
 
-    private void clearDataDir() {
-        AccountManage.deleteAccountFile();
-    }
 
     private void initTabs() {
         List<Integer> listSelectIcon = new ArrayList<>();
@@ -478,14 +498,15 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
     }
 
     private void appExit() {
+        if(NetWorkUtils.getNetworkState()){
+            RequestUtils.unbind();
+        }
         //程序退出停止掉定位
         if (CacheManager.getLocState()) {
             CacheManager.stopCurrentLoc();
             CacheManager.resetState();
         }
 
-        //BlackBoxManger.uploadCurrentBlxFile(); //会卡顿一段时间，体验很差
-        clearDataDir();
 
         unregisterReceiver(networkChangeReceiver);
 
@@ -572,9 +593,6 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
             if (result == TextToSpeech.LANG_MISSING_DATA
                     || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 ToastUtils.showMessage(R.string.tip_08);
-                SPUtils.supportPlay = false;
-            } else {
-                SPUtils.supportPlay = true;
             }
         }
     }
@@ -588,13 +606,23 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
         this.getApplication().sendBroadcast(intent);
     }
 
+    /**
+     * 网络状况监听
+     */
     private void wifiChangeEvent() {
         if (NetWorkUtils.getNetworkState()) {
             if (CacheManager.deviceState.getDeviceState().equals(DeviceState.WIFI_DISCONNECT)) {
                 CacheManager.deviceState.setDeviceState(DeviceState.WAIT_SOCKET);
             } //只有从wifi未连接到连接才出现这种状态
 
-            downloadAccount();
+            initPush();
+
+            String username = SPUtils.getString(SPUtils.USERNAME,"");
+            String password = SPUtils.getString(SPUtils.PASSWORD,"");
+            if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password)){
+                RequestUtils.login(username,password);
+            }
+
             initUDP();  //重连wifi后udp发送ip、端口
         } else {
             ToastUtils.showMessageLong("网络连接已断开！请检查网络是否正常连接！");
@@ -605,36 +633,13 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
 
     }
 
-    /**
-     * 下载账户
-     */
-    private void downloadAccount() {
-        new Thread() {
-            public void run() {
-                try {
-                    if (FTPManager.getInstance().connect()) {
-                        boolean isDownloadSuccess = FTPManager.getInstance().downloadFile(AccountManage.LOCAL_FTP_ACCOUNT_PATH,
-                                AccountManage.ACCOUNT_FILE_NAME);
-                        if (isDownloadSuccess) {
-                            AccountManage.UpdateAccountFromFileToDB();
-                            AccountManage.deleteAccountFile();
-                        }
-
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
 
     /**
      * 创建DatagramSocket
      */
     private void initUDP() {
 
-        if (!SPUtils.getBoolean(SET_STATIC_IP, true)) {     //是否设置自动连接
+        if (!SPUtils.getBoolean(SPUtils.SET_STATIC_IP, true)) {     //是否设置自动连接
             return;
         }
 
@@ -836,8 +841,9 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LicenceDialog.CAMERA_REQUEST_CODE && PermissionUtils.getInstance().
                 hasPermission(MainActivity.this, Manifest.permission.CAMERA)) {
-            startActivity(new Intent(MainActivity.this, ScanCodeActivity.class));
-
+            Intent intent =  new Intent(MainActivity.this, ScanCodeActivity.class);
+            intent.putExtra("type",1);
+            startActivity(intent);
         }
 
     }
@@ -930,9 +936,9 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
                 CacheManager.hasSetDefaultParam = true;
 
                 if (!CacheManager.getLocState()) {     //已设置定位模式，不能设置别的模式
-                    if (VersionManage.isArmyVer()){
+                    if (VersionManage.isArmyVer()) {
                         LTESendManager.setActiveMode("2");
-                    }else {
+                    } else {
                         LTESendManager.setActiveMode("0");
                     }
                 }

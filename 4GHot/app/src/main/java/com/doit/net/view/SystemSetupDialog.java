@@ -17,7 +17,7 @@ import com.doit.net.bean.LteChannelCfg;
 import com.doit.net.protocol.LTESendManager;
 import com.doit.net.utils.CacheManager;
 import com.doit.net.utils.FormatUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 import com.doit.net.utils.ToastUtils;
 
 import org.xutils.view.annotation.Event;

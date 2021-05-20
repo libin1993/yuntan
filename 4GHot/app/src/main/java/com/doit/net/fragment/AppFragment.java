@@ -1,7 +1,18 @@
 package com.doit.net.fragment;
 
+import com.doit.net.activity.MainActivity;
+import com.doit.net.activity.ScanCodeActivity;
+import com.doit.net.base.BaseBean;
+import com.doit.net.base.Callback;
+import com.doit.net.base.RxObserver;
+import com.doit.net.base.Transformer;
 import com.doit.net.event.EventAdapter;
 import com.doit.net.utils.FileUtils;
+import com.doit.net.utils.GsonUtils;
+import com.doit.net.utils.NetWorkUtils;
+import com.doit.net.utils.PermissionUtils;
+import com.doit.net.utils.RetrofitUtils;
+import com.doit.net.utils.SPUtils;
 import com.doit.net.view.ClearHistoryTimeDialog;
 import com.doit.net.activity.CustomFcnActivity;
 import com.doit.net.activity.DeviceParamActivity;
@@ -14,15 +25,19 @@ import com.doit.net.activity.WhitelistManagerActivity;
 import com.doit.net.activity.BlackBoxActivity;
 import com.doit.net.utils.VersionManage;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -37,7 +52,6 @@ import android.widget.TextView;
 
 import com.doit.net.base.BaseFragment;
 import com.doit.net.protocol.LTESendManager;
-import com.doit.net.utils.AccountManage;
 import com.doit.net.utils.CacheManager;
 import com.doit.net.utils.LicenceUtils;
 import com.doit.net.view.MySweetAlertDialog;
@@ -45,7 +59,7 @@ import com.doit.net.utils.LogUtils;
 import com.doit.net.utils.StringUtils;
 import com.doit.net.utils.ToastUtils;
 import com.doit.net.view.LSettingItem;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.xutils.view.annotation.ViewInject;
 
@@ -56,9 +70,12 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import okhttp3.RequestBody;
 
 public class AppFragment extends BaseFragment implements EventAdapter.EventCall {
 
@@ -144,6 +161,7 @@ public class AppFragment extends BaseFragment implements EventAdapter.EventCall 
         View rootView = inflater.inflate(R.layout.doit_layout_app, container, false);
 
         EventAdapter.register(EventAdapter.UPGRADE_STATUS, this);
+        EventAdapter.register(EventAdapter.SCAN_DEVICE_NO, this);
 
         return rootView;
     }
@@ -152,24 +170,25 @@ public class AppFragment extends BaseFragment implements EventAdapter.EventCall 
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        tvLoginAccount.setText(AccountManage.getCurrentLoginAccount());
+        tvLoginAccount.setText(SPUtils.getString(SPUtils.USERNAME,""));
 
         if (VersionManage.isArmyVer()){
             rlWhiteList.setVisibility(View.VISIBLE);
         }
 
+        rlUserManage.setRightText(SPUtils.getString(SPUtils.DEVICE_NO,""));
 
 
-       if (AccountManage.getCurrentPerLevel() >= AccountManage.PERMISSION_LEVEL2) {
-           if (AccountManage.getCurrentPerLevel() >= AccountManage.PERMISSION_LEVEL3){
+       if (CacheManager.currentPermissionLevel >= CacheManager.PERMISSION_LEVEL2) {
+           if (CacheManager.currentPermissionLevel >= CacheManager.PERMISSION_LEVEL3){
                rlTest.setVisibility(View.VISIBLE);
                viewTest.setVisibility(View.VISIBLE);
 
                rlSystemSetting.setVisibility(View.VISIBLE);
                viewSystemSetting.setVisibility(View.VISIBLE);
            }
-           rlUserManage.setVisibility(View.VISIBLE);
-            viewUserManage.setVisibility(View.VISIBLE);
+//            rlUserManage.setVisibility(View.VISIBLE);
+//            viewUserManage.setVisibility(View.VISIBLE);
 
             if (VersionManage.isArmyVer()){
                 rlBlackBox.setVisibility(View.GONE);
@@ -188,9 +207,20 @@ public class AppFragment extends BaseFragment implements EventAdapter.EventCall 
         rlUserManage.setmOnLSettingItemClick(new LSettingItem.OnLSettingItemClick() {
             @Override
             public void click(LSettingItem item) {
-                if (!CacheManager.checkDevice(getContext()))
+                if (!NetWorkUtils.getNetworkState()){
+                    ToastUtils.showMessage("请先连接设备WIFI，否则将无法使用");
                     return;
-                startActivity(new Intent(getActivity(), UserManageActivity.class));
+                }
+
+                if (PermissionUtils.getInstance().hasPermission(getActivity(), Manifest.permission.CAMERA)) {
+                    Intent intent =  new Intent(getActivity(), ScanCodeActivity.class);
+                    intent.putExtra("type",2);
+                    getActivity().startActivity(intent);
+                } else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        ActivityCompat.requestPermissions( getActivity(),new String[]{Manifest.permission.CAMERA}, 123);
+                    }
+                }
             }
         });
 
@@ -476,6 +506,48 @@ public class AppFragment extends BaseFragment implements EventAdapter.EventCall 
     public void call(String key, Object val) {
         if (key.equals(EventAdapter.UPGRADE_STATUS)) {
             mHandler.sendEmptyMessage(UPGRADE_STATUS_RPT);
+        }else if (key.equals(EventAdapter.SCAN_DEVICE_NO)){
+            String result = (String) val;
+
+            if (!TextUtils.isEmpty(result) && result.startsWith("LTE") && result.length() > 3) {
+                String deviceNo = result.substring(3);
+                bindDevice(deviceNo);
+            } else {
+                ToastUtils.showMessage("二维码无效");
+            }
         }
+    }
+
+
+    /**
+     * 绑定设备
+     */
+    public void bindDevice(String deviceNo){
+        if(TextUtils.isEmpty(deviceNo)){
+            ToastUtils.showMessage("设备编号不存在");
+            return ;
+        }
+        Map<String,Object> map = new HashMap<>();
+        map.put("deviceNo",deviceNo);
+
+        RequestBody body= RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), GsonUtils.jsonString(map));
+        RetrofitUtils.getInstance()
+                .getService()
+                .bind(body)
+                .compose(Transformer.switchSchedulers())
+                .subscribe(new RxObserver(new Callback<BaseBean>() {
+                    @Override
+                    public void onSuccess(BaseBean baseBean) {
+                        ToastUtils.showMessage("绑定设备成功");
+                        SPUtils.setString(SPUtils.DEVICE_NO,deviceNo);
+                        rlUserManage.setRightText(deviceNo);
+
+                    }
+
+                    @Override
+                    public void onFail(String msg) {
+                        ToastUtils.showMessage(msg);
+                    }
+                }));
     }
 }

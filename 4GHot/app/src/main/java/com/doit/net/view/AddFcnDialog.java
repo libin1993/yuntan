@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.doit.net.utils.FormatUtils;
 import com.doit.net.utils.ToastUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 /**
  * Author：Libin on 2020/5/22 17:05

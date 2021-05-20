@@ -9,7 +9,7 @@ import android.view.View;
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.doit.net.utils.ToastUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.xutils.x;
 

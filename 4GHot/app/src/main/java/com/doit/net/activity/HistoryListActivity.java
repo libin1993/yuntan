@@ -28,7 +28,7 @@ import com.doit.net.utils.UCSIDBManager;
 import com.doit.net.utils.DateUtils;
 import com.doit.net.view.MySweetAlertDialog;
 import com.doit.net.utils.StringUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 import com.doit.net.utils.ToastUtils;
 
 import org.xutils.DbManager;
@@ -271,6 +271,7 @@ public class HistoryListActivity extends BaseActivity implements EventAdapter.Ev
                 try {
                     dbUeidInfos = dbManager.selector(DBUeidInfo.class)
                             .where("imsi", "like", "%" + keyword + "%")
+                            .or("msisdn","like","%" + keyword + "%")
                             .orderBy("id", true)
                             .findAll();
                 } catch (DbException e) {
@@ -314,24 +315,20 @@ public class HistoryListActivity extends BaseActivity implements EventAdapter.Ev
             BufferedWriter bufferedWriter = null;
             try {
                 bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fullPath,true)));
-                bufferedWriter.write("imsi,tmsi,时间,经度,纬度"+"\r\n");
+                bufferedWriter.write("imsi,手机号,时间,经度,纬度"+"\r\n");
                 for (DBUeidInfo info: dbUeidInfos) {
-                    //bufferedWriter.write(DateUtil.getDateByFormat(info.getCreateDate(),DateUtil.LOCAL_DATE)+",");
                     bufferedWriter.write(info.getImsi()+",");
-                    bufferedWriter.write(info.getTmsi()+",");
+                    bufferedWriter.write(info.getMsisdn()+",");
                     bufferedWriter.write(DateUtils.convert2String(info.getCreateDate(), DateUtils.LOCAL_DATE)+",");
                     bufferedWriter.write(StringUtils.defaultString(info.getLongitude())+",");
                     bufferedWriter.write(StringUtils.defaultString(info.getLatitude()));
                     bufferedWriter.write("\r\n");
                 }
             } catch (DbException e) {
-                //log.error("Export SELECT ERROR",e);
                 createExportError("数据查询错误");
             } catch (FileNotFoundException e){
-                //log.error("File Error",e);
                 createExportError("文件未创建成功");
             } catch (IOException e){
-                //log.error("File Error",e);
                 createExportError("写入文件错误");
             } finally {
                 if(bufferedWriter != null){

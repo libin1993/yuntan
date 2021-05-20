@@ -14,7 +14,7 @@ import android.widget.TimePicker;
 import android.widget.TimePicker.OnTimeChangedListener;
 
 
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;

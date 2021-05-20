@@ -49,7 +49,7 @@ import java.util.TimerTask;
  */
 public class CacheManager {
     public static String DEVICE_IP; //设备IP
-    public static final String DEFAULT_DEVICE_IP = "192.168.4.100";
+    public static final String DEFAULT_DEVICE_IP = "192.168.1.200";
     public static List<UeidBean> realtimeUeidList = new ArrayList<>();
     public static final int MAX_REALTIME_LIST_SIZE = 300;
 
@@ -71,6 +71,13 @@ public class CacheManager {
     private static boolean hasPressStartButton = false;  //是否已经在主页面点击开始按钮
 
     public static boolean checkLicense = false; //连接成功后校验证书
+
+    //等级越高，可见的就越多
+    public static final int PERMISSION_LEVEL1 = 1;
+    public static final int PERMISSION_LEVEL2 = 2;
+    public static final int PERMISSION_LEVEL3 = 3;
+
+    public static int currentPermissionLevel = PERMISSION_LEVEL2;
 
     public static boolean getLocMode() {
         return loc_mode;
@@ -111,7 +118,6 @@ public class CacheManager {
         if (currentLocation == null) {
             currentLocation = new LocationBean();
         }
-        SPUtils.setImsi(imsi);
         currentLocation.setImsi(imsi);
     }
 

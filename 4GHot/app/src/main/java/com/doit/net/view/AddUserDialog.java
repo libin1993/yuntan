@@ -11,14 +11,13 @@ import android.widget.EditText;
 
 import com.doit.net.utils.BlackBoxManger;
 import com.doit.net.event.EventAdapter;
-import com.doit.net.utils.AccountManage;
 import com.doit.net.utils.CacheManager;
 import com.doit.net.utils.UCSIDBManager;
 import com.doit.net.bean.UserInfo;
 import com.doit.net.utils.FormatUtils;
 import com.doit.net.utils.LoadingUtils;
 import com.doit.net.utils.ToastUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
@@ -133,16 +132,16 @@ public class AddUserDialog extends Dialog {
             info.setPassword(password);
             dbManager.save(info);
 
-            if (AccountManage.UpdateAccountToDevice()){
-                ToastUtils.showMessage(R.string.add_success);
-                return 0;
-            }else{
-                dbManager.delete(info);
-                new SweetAlertDialog(getContext(), SweetAlertDialog.ERROR_TYPE)
-                        .setTitleText(getContext().getString(R.string.add_user_fail))
-                        .setContentText(getContext().getString(R.string.add_user_fail_ftp))
-                        .show();
-            }
+//            if (AccountManage.UpdateAccountToDevice()){
+//                ToastUtils.showMessage(R.string.add_success);
+//                return 0;
+//            }else{
+//                dbManager.delete(info);
+//                new SweetAlertDialog(getContext(), SweetAlertDialog.ERROR_TYPE)
+//                        .setTitleText(getContext().getString(R.string.add_user_fail))
+//                        .setContentText(getContext().getString(R.string.add_user_fail_ftp))
+//                        .show();
+//            }
 
 
 

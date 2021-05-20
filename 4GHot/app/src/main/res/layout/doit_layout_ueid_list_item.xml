@@ -24,6 +24,15 @@
             android:paddingRight="18dp"
             android:layout_height="60dp" />
         <ImageView
+            android:id="@+id/iv_translate"
+            android:src="@drawable/ic_translate"
+            android:layout_width="60dp"
+            android:background="@color/blue_4d7"
+            android:paddingLeft="18dp"
+            android:paddingRight="18dp"
+            android:layout_height="60dp" />
+
+        <ImageView
             android:id="@+id/add_to_black"
             android:src="@drawable/icon_0000s_0002s_0005_user"
             android:layout_width="60dp"

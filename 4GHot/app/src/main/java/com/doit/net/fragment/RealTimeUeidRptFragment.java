@@ -31,7 +31,7 @@ import com.doit.net.view.MySweetAlertDialog;
 import com.doit.net.utils.ToastUtils;
 import com.doit.net.utils.LogUtils;
 import com.doit.net.utils.UtilOperator;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -171,6 +171,7 @@ public class RealTimeUeidRptFragment extends BaseFragment implements EventAdapte
                     if (times > 1000) {
                         times = 0;
                     }
+                    CacheManager.realtimeUeidList.get(i).setMsisdn(ueidBean.getMsisdn());
                     CacheManager.realtimeUeidList.get(i).setRptTimes(times + 1);
                     CacheManager.realtimeUeidList.get(i).setSrsp("" + Integer.parseInt(ueidBean.getSrsp()) * 5 / 6);
                     CacheManager.realtimeUeidList.get(i).setRptTime(DateUtils.convert2String(new Date().getTime(), DateUtils.LOCAL_DATE));
@@ -181,13 +182,14 @@ public class RealTimeUeidRptFragment extends BaseFragment implements EventAdapte
 
             if (!isContain){
                 UeidBean newUeid = new UeidBean();
+                newUeid.setMsisdn(ueidBean.getMsisdn());
                 newUeid.setImsi(ueidBean.getImsi());
                 newUeid.setSrsp("" + Integer.parseInt(ueidBean.getSrsp()) * 5 / 6);
                 newUeid.setRptTime(DateUtils.convert2String(new Date().getTime(), DateUtils.LOCAL_DATE));
                 newUeid.setRptTimes(1);
                 CacheManager.realtimeUeidList.add(newUeid);
 
-                UCSIDBManager.saveUeidToDB(ueidBean.getImsi(), "", "",
+                UCSIDBManager.saveUeidToDB(ueidBean.getImsi(), ueidBean.getMsisdn(), "",
                         new Date().getTime(), "", "");
             }
 

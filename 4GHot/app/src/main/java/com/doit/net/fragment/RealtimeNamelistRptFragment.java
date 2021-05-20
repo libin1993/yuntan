@@ -21,7 +21,7 @@ import com.doit.net.event.EventAdapter;
 import com.doit.net.utils.CacheManager;
 import com.doit.net.bean.DBBlackInfo;
 import com.doit.net.utils.UCSIDBManager;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.xutils.ex.DbException;
 
@@ -122,7 +122,7 @@ public class RealtimeNamelistRptFragment extends BaseFragment implements  EventA
         try {
             DBBlackInfo info = UCSIDBManager.getDbManager().selector(DBBlackInfo.class).where("imsi","=", imsi).findFirst();
             if(info != null){
-                name = info.getName();
+//                name = info.getName();
             }
         } catch (DbException e) {
             e.printStackTrace();

@@ -15,7 +15,7 @@ import com.doit.net.utils.BlackBoxManger;
 import com.doit.net.utils.UCSIDBManager;
 import com.doit.net.bean.WhiteListInfo;
 import com.doit.net.utils.ToastUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;

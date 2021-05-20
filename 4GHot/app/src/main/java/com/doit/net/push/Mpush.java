@@ -20,12 +20,14 @@
 
 package com.doit.net.push;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.annotation.Nullable;
 
+import com.doit.net.application.MyApplication;
 import com.mpush.api.Client;
 import com.mpush.api.ClientListener;
 import com.mpush.api.Constants;
@@ -42,10 +44,10 @@ import java.util.concurrent.Future;
  * 服务的启动，暂停，恢复，停止，用户绑定等方法
  * <p/>
  * Created by yxx on 2016/2/13.
- *
+ * 河西推送push类
  * @author ohun@live.cn
  */
-public final class MPush {
+public final class Mpush {
     private static final String SP_FILE_NAME = "mpush.cfg";
     private static final String SP_KEY_CV = "clientVersion";
     private static final String SP_KEY_DI = "deviceId";
@@ -54,10 +56,11 @@ public final class MPush {
     private static final String SP_KEY_AT = "account";
     private static final String SP_KEY_TG = "tags";
     private static final String SP_KEY_LG = "log";
-    public static MPush I = I();
+    @SuppressLint("StaticFieldLeak")
+    public static Mpush showStart = showStart();
     private Context ctx;
     private ClientConfig clientConfig;
-    private SharedPreferences sp;
+    private  SharedPreferences sp;
     /*package*/ Client client;
 
     /**
@@ -65,15 +68,15 @@ public final class MPush {
      *
      * @return
      */
-    static /*package*/ MPush I() {
-        if (I == null) {
-            synchronized (MPush.class) {
-                if (I == null) {
-                    I = new MPush();
+    private static Mpush showStart() {
+        if (showStart == null) {
+            synchronized (Mpush.class) {
+                if (showStart == null) {
+                    showStart = new Mpush();
                 }
             }
         }
-        return I;
+        return showStart;
     }
 
     /**
@@ -81,7 +84,7 @@ public final class MPush {
      *
      * @param context
      */
-    public void init(Context context) {
+    private void init(Context context) {
         ctx = context.getApplicationContext();
         sp = ctx.getSharedPreferences(SP_FILE_NAME, Context.MODE_PRIVATE);
     }
@@ -91,7 +94,7 @@ public final class MPush {
      *
      * @return
      */
-    public boolean hasInit() {
+    private boolean hasInit() {
         return ctx != null;
     }
 
@@ -100,7 +103,7 @@ public final class MPush {
      *
      * @return
      */
-    public MPush checkInit(Context context) {
+    public Mpush checkInit(Context context) {
         if (ctx == null) {
             init(context);
         }
@@ -108,7 +111,7 @@ public final class MPush {
     }
 
     /**
-     * MPushService 是否已启动
+     * MpushService 是否已启动
      *
      * @return
      */
@@ -133,7 +136,7 @@ public final class MPush {
     public void setClientConfig(ClientConfig clientConfig) {
         if (clientConfig.getPublicKey() == null
                 || clientConfig.getAllotServer() == null
-                || clientConfig.getClientVersion() == null) {
+                || clientConfig.getClientVersion() == null || sp == null) {
             throw new IllegalArgumentException("publicKey, allocServer can not be null");
         }
 
@@ -159,7 +162,7 @@ public final class MPush {
      */
     public void startPush() {
         if (hasInit()) {
-            ctx.startService(new Intent(ctx, MPushService.class));
+            ctx.startService(new Intent(ctx, MpushService.class));
         }
     }
 
@@ -168,7 +171,7 @@ public final class MPush {
      */
     public void stopPush() {
         if (hasInit()) {
-            ctx.stopService(new Intent(ctx, MPushService.class));
+            ctx.stopService(new Intent(ctx, MpushService.class));
         }
     }
 
@@ -291,7 +294,7 @@ public final class MPush {
 
     @Nullable
     private ClientConfig getClientConfig() {
-        if (clientConfig == null) {
+        if (clientConfig == null && sp != null) {
             String clientVersion = sp.getString(SP_KEY_CV, null);
             String deviceId = sp.getString(SP_KEY_DI, null);
             String publicKey = sp.getString(SP_KEY_PK, null);
@@ -304,7 +307,7 @@ public final class MPush {
                     .setOsName(Constants.DEF_OS_NAME)
                     .setOsVersion(Build.VERSION.RELEASE)
                     .setClientVersion(clientVersion)
-                    .setLogger(new MPushLog())
+                    .setLogger(new MpushLog())
                     .setLogEnabled(logEnabled);
         }
         if (clientConfig.getClientVersion() == null
@@ -314,7 +317,7 @@ public final class MPush {
         }
 
         if (clientConfig.getSessionStorageDir() == null) {
-            clientConfig.setSessionStorage(new SPSessionStorage(sp));
+            clientConfig.setSessionStorage(new SpSessionStorage(sp));
         }
 
         if (clientConfig.getOsVersion() == null) {
@@ -330,7 +333,7 @@ public final class MPush {
         }
 
         if (clientConfig.getLogger() instanceof DefaultLogger) {
-            clientConfig.setLogger(new MPushLog());
+            clientConfig.setLogger(new MpushLog());
         }
         return clientConfig;
     }
@@ -346,9 +349,9 @@ public final class MPush {
         if (client != null) {
             client.destroy();
         }
-        I.client = null;
-        I.clientConfig = null;
-        I.sp = null;
-        I.ctx = null;
+        showStart.client = null;
+        showStart.clientConfig = null;
+        showStart.sp = null;
+        showStart.ctx = null;
     }
 }

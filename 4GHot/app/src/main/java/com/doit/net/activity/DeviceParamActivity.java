@@ -7,15 +7,13 @@ import android.os.Bundle;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
-import com.doit.net.ucsi.BuildConfig;
-import com.doit.net.utils.AccountManage;
 import com.doit.net.utils.FormatUtils;
 import com.doit.net.utils.ScreenUtils;
 import com.doit.net.utils.VersionManage;
 import com.doit.net.view.SystemSetupDialog;
 import com.doit.net.base.BaseActivity;
 import com.doit.net.view.MySweetAlertDialog;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import android.os.Handler;
 import android.os.Message;
@@ -145,7 +143,7 @@ public class DeviceParamActivity extends BaseActivity implements EventAdapter.Ev
             }
         };
         rvBand.setAdapter(adapter);
-        if (AccountManage.getCurrentPerLevel() >= AccountManage.PERMISSION_LEVEL3){
+        if (CacheManager.currentPermissionLevel >= CacheManager.PERMISSION_LEVEL3){
             adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(BaseQuickAdapter adapter, View view, int position) {

@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.doit.net.bean.CollideTimePointBean;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import java.util.List;
 

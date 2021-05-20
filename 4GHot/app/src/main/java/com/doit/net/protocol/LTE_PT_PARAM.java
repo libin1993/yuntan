@@ -4,6 +4,9 @@ package com.doit.net.protocol;
 import android.text.TextUtils;
 
 import com.doit.net.bean.DBBlackInfo;
+import com.doit.net.bean.DBUeidInfo;
+import com.doit.net.push.RequestUtils;
+import com.doit.net.utils.NetWorkUtils;
 import com.doit.net.utils.UCSIDBManager;
 import com.doit.net.utils.VersionManage;
 import com.doit.net.sockets.ServerSocketUtils;
@@ -20,7 +23,7 @@ import com.doit.net.utils.ToastUtils;
 import com.doit.net.utils.LogUtils;
 import com.doit.net.utils.UtilDataFormatChange;
 import com.doit.net.utils.UtilOperator;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
@@ -296,12 +299,25 @@ public class LTE_PT_PARAM {
                     if (splitUeid.length < 1 || splitUeid[0].length() < 15) {
                         continue;
                     }
+
+
+
+                    DbManager dbManager = UCSIDBManager.getDbManager();
+                    DBUeidInfo ueidInfo = dbManager.selector(DBUeidInfo.class).where("imsi", "=", splitUeid[0]).findFirst();
+                    if(NetWorkUtils.getNetworkState() && (ueidInfo==null || TextUtils.isEmpty(ueidInfo.getMsisdn()))){
+                        RequestUtils.uploadIMSI(splitUeid[0]);
+                    }
+
                     UeidBean ueidBean = new UeidBean();
                     ueidBean.setImsi(splitUeid[0]);
                     ueidBean.setSrsp("0");
+                    if (ueidInfo!=null && TextUtils.isEmpty(ueidInfo.getMsisdn())){
+                        ueidBean.setMsisdn(ueidInfo.getMsisdn());
+                    }else {
+                        ueidBean.setMsisdn("");
+                    }
 
                     ueidList.add(ueidBean);
-
                 }
                 bufferedReader.close();
                 file.delete();   //处理完删除

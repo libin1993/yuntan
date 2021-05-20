@@ -1,10 +1,11 @@
 package com.doit.net.base;
 
 
-import android.content.Intent;
+import android.text.TextUtils;
 
-
+import com.doit.net.push.RequestUtils;
 import com.doit.net.utils.LogUtils;
+import com.doit.net.utils.SPUtils;
 
 import io.reactivex.Observer;
 import io.reactivex.annotations.NonNull;
@@ -32,6 +33,12 @@ public class RxObserver<T extends BaseBean> implements Observer<T> {
     public void onNext(T t) {
         if (t.getCode() == 0) {
             mCallback.onSuccess(t);
+        }else if (t.getCode() == 401 || t.getCode() ==403){  //token失效
+            String username = SPUtils.getString(SPUtils.USERNAME,"");
+            String password = SPUtils.getString(SPUtils.PASSWORD,"");
+            if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password)){
+                RequestUtils.login(username,password);
+            }
         }else {
             mCallback.onFail(t.getMsg());
         }
@@ -41,7 +48,7 @@ public class RxObserver<T extends BaseBean> implements Observer<T> {
     public void onError(@NonNull Throwable e) {
         e.printStackTrace();
         LogUtils.log(e.toString());
-        mCallback.onFail("网络异常,请联系客服");
+        mCallback.onFail("网络异常，请检查网络是否正常连接");
     }
 
     @Override

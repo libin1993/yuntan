@@ -20,34 +20,51 @@
 
 package com.doit.net.push;
 
-import android.content.SharedPreferences;
+import android.util.Log;
 
-import com.mpush.api.connection.SessionStorage;
+import com.mpush.api.Logger;
+
 
 /**
  * Created by yxx on 2016/2/15.
  *
  * @author ohun@live.cn
  */
-public final class SPSessionStorage implements SessionStorage {
-    private final SharedPreferences sp;
+public final class MpushLog implements Logger {
+    public static final String TAG = "MPUSH";
 
-    public SPSessionStorage(SharedPreferences sp) {
-        this.sp = sp;
+    private boolean enable = true;
+
+    @Override
+    public void enable(boolean enabled) {
+        this.enable = enabled;
     }
 
     @Override
-    public void saveSession(String sessionContext) {
-        sp.edit().putString("session", sessionContext).apply();
+    public void d(String s, Object... args) {
+        if (enable) {
+            Log.d(TAG, String.format(s, args));
+        }
     }
 
     @Override
-    public String getSession() {
-        return sp.getString("session", null);
+    public void i(String s, Object... args) {
+        if (enable) {
+            Log.i(TAG, String.format(s, args));
+        }
     }
 
     @Override
-    public void clearSession() {
-        sp.edit().remove("session").apply();
+    public void w(String s, Object... args) {
+        if (enable) {
+            Log.w(TAG, String.format(s, args));
+        }
+    }
+
+    @Override
+    public void e(Throwable e, String s, Object... args) {
+        if (enable) {
+            Log.e(TAG, String.format(s, args), e);
+        }
     }
 }

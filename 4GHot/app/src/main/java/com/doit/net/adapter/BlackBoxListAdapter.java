@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.doit.net.bean.BlackBoxBean;
 import com.doit.net.utils.DateUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import java.util.List;
 

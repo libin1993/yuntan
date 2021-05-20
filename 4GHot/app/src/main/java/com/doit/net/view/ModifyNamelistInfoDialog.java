@@ -15,7 +15,7 @@ import com.doit.net.event.EventAdapter;
 import com.doit.net.bean.DBBlackInfo;
 import com.doit.net.utils.UCSIDBManager;
 import com.doit.net.utils.ToastUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
@@ -94,7 +94,7 @@ public class ModifyNamelistInfoDialog extends Dialog {
                         db.delete(tmpNamelist);
                         new AddToLocalBlackListener(getContext(),name,imsi,remark).onClick(v);
                     }else{
-                        tmpNamelist.setName(etName.getText().toString());
+                        tmpNamelist.setMsisdn(etName.getText().toString());
                         tmpNamelist.setRemark(etRemake.getText().toString());
                         db.update(tmpNamelist, "name", "remark");
                     }

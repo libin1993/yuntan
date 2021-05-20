@@ -52,6 +52,7 @@ public class NetWorkUtils {
         return ethernetState || wifiState;
     }
 
+
     public static boolean isMobileConnected() {
         ConnectivityManager mConnectivityManager = (ConnectivityManager) MyApplication.mContext
                 .getSystemService(Context.CONNECTIVITY_SERVICE);

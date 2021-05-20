@@ -28,6 +28,7 @@ import com.doit.net.utils.FileUtils;
 import com.doit.net.utils.LogUtils;
 import com.doit.net.utils.StringUtils;
 import com.doit.net.adapter.BlacklistAdapter;
+import com.doit.net.view.AddBlacklistDialog;
 import com.doit.net.view.NameListEditDialog;
 import com.doit.net.base.BaseFragment;
 import com.doit.net.utils.BlackBoxManger;
@@ -36,7 +37,7 @@ import com.doit.net.bean.DBBlackInfo;
 import com.doit.net.utils.UCSIDBManager;
 import com.doit.net.utils.DateUtils;
 import com.doit.net.view.MySweetAlertDialog;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 import com.doit.net.utils.ToastUtils;
 
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -183,7 +184,7 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
             try {
                 dbBlackInfos = dbManager.selector(DBBlackInfo.class)
                         .where("imsi", "like", "%" + keyword + "%")
-                        .or("name", "like", "%" + keyword + "%")
+                        .or("msisdn", "like", "%" + keyword + "%")
                         .or("remark", "like", "%" + keyword + "%")
                         .orderBy("id", true)
                         .findAll();
@@ -204,15 +205,14 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
     View.OnClickListener addClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            NameListEditDialog dialog = new NameListEditDialog(getActivity());
-            dialog.show();
-            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            AddBlacklistDialog addBlacklistDialog = new AddBlacklistDialog(getActivity());
+            addBlacklistDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    //btSearch.performClick();如果此时输入框里有东西，应该是刷不出来的0.o
                     refreshNamelist();
                 }
             });
+            addBlacklistDialog.show();
         }
     };
 
@@ -278,11 +278,9 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
                         Cell cell1 = row.createCell(0);
                         cell1.setCellValue("IMSI");
                         Cell cell2 = row.createCell(1);
-                        cell2.setCellValue("姓名");
+                        cell2.setCellValue("手机号");
                         Cell cell3 = row.createCell(2);
                         cell3.setCellValue("备注");
-                        Cell cell4 = row.createCell(3);
-                        cell4.setCellValue("创建时间");
 
 
                         if (dbBlackInfos == null || dbBlackInfos.size() == 0) {
@@ -291,9 +289,8 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
                             for (int i = 0; i < dbBlackInfos.size(); i++) {
                                 Row rowi = sheet.createRow(i + 1);
                                 rowi.createCell(0).setCellValue(dbBlackInfos.get(i).getImsi() + "");
-                                rowi.createCell(1).setCellValue(dbBlackInfos.get(i).getName() + "");
+                                rowi.createCell(1).setCellValue(dbBlackInfos.get(i).getMsisdn() + "");
                                 rowi.createCell(2).setCellValue(dbBlackInfos.get(i).getRemark() + "");
-                                rowi.createCell(3).setCellValue(DateUtils.convert2String(dbBlackInfos.get(i).getCreateDate(), DateUtils.LOCAL_DATE));
                             }
                         }
 
@@ -303,15 +300,14 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
                         outputStream.close();
                     } else {
                         BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file,true)));
-                        bufferedWriter.write("IMSI,姓名,备注,创建时间"+"\r\n");
+                        bufferedWriter.write("IMSI,手机号,备注"+"\r\n");
                         if (dbBlackInfos == null || dbBlackInfos.size() == 0){
                             ToastUtils.showMessageLong("当前名单为空，此次导出为模板");
                         }else{
                             for (DBBlackInfo info: dbBlackInfos) {
                                 bufferedWriter.write(info.getImsi()+",");
-                                bufferedWriter.write(info.getName()+",");
+                                bufferedWriter.write(info.getMsisdn()+",");
                                 bufferedWriter.write(StringUtils.defaultString(info.getRemark())+",");
-                                bufferedWriter.write(DateUtils.convert2String(info.getCreateDate(), DateUtils.LOCAL_DATE));
                                 bufferedWriter.write("\r\n");
                             }
                         }
@@ -341,96 +337,6 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
     View.OnClickListener importNamelistClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
-//            File file = new File(FileUtils.ROOT_PATH);
-//            if (!file.exists()) {
-//                ToastUtils.showMessageLong("未找到黑名单，请确认已将黑名单放在\"手机存储/" + FileUtils.ROOT_DIRECTORY + "\"目录下");
-//                return;
-//            }
-//
-//            File[] files = file.listFiles();
-//            if (files == null || files.length == 0) {
-//                ToastUtils.showMessageLong("未找到黑名单，请确认已将黑名单放在\"手机存储/" + FileUtils.ROOT_DIRECTORY + "\"目录下");
-//                return;
-//            }
-//
-//            List<FileBean> fileList = new ArrayList<>();
-//
-//            for (int i = 0; i < files.length; i++) {
-//                String tmpFileName = files[i].getName();
-//                if (tmpFileName.endsWith(".xls") || tmpFileName.endsWith(".xlsx") || tmpFileName.endsWith(".txt")) {
-//                    FileBean fileBean = new FileBean();
-//                    fileBean.setFileName(tmpFileName);
-//                    fileBean.setCheck(false);
-//                    fileList.add(fileBean);
-//                }
-//            }
-//
-//            if (fileList.size() == 0) {
-//                ToastUtils.showMessageLong("未找到黑名单，黑名单必须是以\".xls\"或\".xlsx\"为后缀的文件");
-//                return;
-//            }
-//
-//
-//            fileList.get(0).setCheck(true);  //默认选中第一个
-//
-//            View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.layout_import_whitelist, null);
-//            PopupWindow mPopupWindow = new PopupWindow(dialogView, FormatUtils.getInstance().dip2px(300), ViewGroup.LayoutParams.WRAP_CONTENT);
-//
-//            //设置Popup具体控件
-//            RecyclerView rvFile = dialogView.findViewById(R.id.rv_file);
-//            Button btnCancel = dialogView.findViewById(R.id.btn_cancel_import);
-//            Button btnConfirm = dialogView.findViewById(R.id.btn_confirm_import);
-//            TextView tvTitle = dialogView.findViewById(R.id.tv_import_whitelist);
-//            tvTitle.setText("请选择黑名单文件");
-//
-//
-//            //设置Popup具体参数
-//            mPopupWindow.setBackgroundDrawable(new BitmapDrawable(getResources(), (Bitmap) null));
-//            mPopupWindow.setFocusable(true);//点击空白，popup不自动消失
-//            mPopupWindow.setTouchable(true);//popup区域可触摸
-//            mPopupWindow.setOutsideTouchable(true);//非popup区域可触摸
-//            mPopupWindow.showAtLocation(getActivity().getWindow().getDecorView(), Gravity.CENTER, 0, 0);
-//
-//
-//            rvFile.setLayoutManager(new LinearLayoutManager(getActivity()));
-//            BaseQuickAdapter<FileBean, BaseViewHolder> adapter = new BaseQuickAdapter<FileBean, BaseViewHolder>(R.layout.layout_file_item, fileList) {
-//                @Override
-//                protected void convert(BaseViewHolder helper, FileBean item) {
-//                    helper.setText(R.id.tv_file_name, item.getFileName());
-//                    helper.setVisible(R.id.iv_select_whitelist, item.isCheck());
-//                }
-//            };
-//
-//            rvFile.setAdapter(adapter);
-//
-//
-//            adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
-//                @Override
-//                public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-//                    for (int i = 0; i < fileList.size(); i++) {
-//                        fileList.get(i).setCheck(i == position);
-//                    }
-//                    adapter.notifyDataSetChanged();
-//                }
-//            });
-//
-//            btnCancel.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    mPopupWindow.dismiss();
-//                }
-//            });
-//
-//            btnConfirm.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    mPopupWindow.dismiss();
-//
-//                    importBlackList(fileList);
-//                }
-//            });
-
 
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("text/plain|application/vnd.ms-excel|application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -497,16 +403,6 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
         new Thread(new Runnable() {
             @Override
             public void run() {
-//                File file = null;
-//                for (FileBean fileBean : fileList) {
-//                    if (fileBean.isCheck()) {
-//                        file = new File(FileUtils.ROOT_PATH + fileBean.getFileName());
-//                        break;
-//                    }
-//                }
-//                if (file == null) {
-//                    return;
-//                }
 
                 File file = new File(filePath);
 
@@ -522,13 +418,13 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
                     List<DBBlackInfo> listValidBlack = new ArrayList<>();
                     if (file.getName().endsWith(".txt")) {
 
-                        String name = "";
+                        String msisdn = "";
                         String remark = "";
 
                         BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
                         String readline = "";
                         while ((readline = bufferedReader.readLine()) != null) {
-                            if (readline.contains("IMSI") && readline.contains("姓名"))
+                            if (readline.contains("IMSI") || readline.contains("手机号") || readline.contains("备注"))
                                 continue;
 
                             if (!isBlacklistFormatRight(readline)) {
@@ -544,20 +440,20 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
                             //如果含有创建时间（即有3个，）的话，那split(",")的返回值固定为4
                             int i = readline.length() - readline.replace(",", "").length();
                             if (i == 3) {
-                                name = readline.split(",")[1];
+                                msisdn = readline.split(",")[1];
                                 remark = readline.split(",")[2];
                             } else if (i == 2) {
                                 if (!readline.endsWith(",")) {
                                     remark = readline.split(",")[2];
                                 }
-                                name = readline.substring(readline.indexOf(",") + 1, readline.lastIndexOf(","));
+                                msisdn = readline.substring(readline.indexOf(",") + 1, readline.lastIndexOf(","));
                             } else {
                                 errorFormatNum++;
                                 continue;
                             }
 
-                            if (!TextUtils.isEmpty(name) && name.length() > 5) {
-                                name = name.substring(0, 5);
+                            if (!TextUtils.isEmpty(msisdn) && (msisdn.length() != 11 || !isNumeric(msisdn)) ) {
+                                msisdn = "";
                             }
 
                             if (!TextUtils.isEmpty(remark) && remark.length() > 8) {
@@ -567,12 +463,10 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
 
                             validImportNum++;
                             listValidBlack.add(new DBBlackInfo(readline.split(",")[0],
-                                    name, remark, new Date()));
+                                    msisdn,remark));
                             if (validImportNum > 100)
                                 break;
-
                         }
-
 
                     } else {
                         InputStream stream = new FileInputStream(file);
@@ -583,16 +477,16 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
 
                         for (int r = 0; r < rowsCount; r++) {
                             String imsi = "";
-                            String name = "";
+                            String msisdn = "";
                             String remark = "";
                             Row row = sheet.getRow(r);
 
 
                             imsi = getCellAsString(row, 0, formulaEvaluator);
-                            name = getCellAsString(row, 1, formulaEvaluator);
+                            msisdn = getCellAsString(row, 1, formulaEvaluator);
                             remark = getCellAsString(row, 2, formulaEvaluator);
 
-                            if ("IMSI".equals(imsi) && "姓名".equals(name)) {
+                            if ("IMSI".equals(imsi) || "手机号".equals(msisdn) || "姓名".equals(remark)) {
                                 continue;
                             }
 
@@ -608,8 +502,8 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
                                 continue;
                             }
 
-                            if (!TextUtils.isEmpty(name) && name.length() > 5) {
-                                name = name.substring(0, 5);
+                            if (!TextUtils.isEmpty(msisdn) && (msisdn.length() != 11 || !isNumeric(msisdn)) ) {
+                                msisdn = "";
                             }
 
                             if (!TextUtils.isEmpty(remark) && remark.length() > 8) {
@@ -617,7 +511,7 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
                             }
 
                             validImportNum++;
-                            listValidBlack.add(new DBBlackInfo(imsi, name, remark, new Date()));
+                            listValidBlack.add(new DBBlackInfo(imsi, msisdn, remark));
 
                             if (validImportNum > 100)  //黑名单最大100
                                 break;
@@ -635,10 +529,6 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
                             repeatNum + "个重复的名单，忽略" + errorFormatNum + "行格式或号码错误";
                     mHandler.sendMessage(message);
 
-//                    if (CacheManager.isDeviceOk() && !CacheManager.getLocState()) {
-//                        //当导入量相当大时，数据下发是相当慢的，所以放在子线程里发
-//                        CacheManager.setCurrentBlackList();
-//                    }
 
                     EventAdapter.call(EventAdapter.ADD_BLACKBOX, BlackBoxManger.IMPORT_NAMELIST + file.getName());
                 } catch (Exception e) {
@@ -719,7 +609,6 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
                     .setConfirmClickListener(new MySweetAlertDialog.OnSweetClickListener() {
                         @Override
                         public void onClick(MySweetAlertDialog sweetAlertDialog) {
-//                            CacheManager.clearCurrentBlackList();
                             try {
                                 dbManager.delete(DBBlackInfo.class);
                             } catch (DbException e) {

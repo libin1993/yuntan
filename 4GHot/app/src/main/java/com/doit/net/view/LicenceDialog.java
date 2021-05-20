@@ -25,7 +25,7 @@ import com.doit.net.utils.LicenceUtils;
 import com.doit.net.utils.PermissionUtils;
 import com.doit.net.utils.ToastUtils;
 import com.doit.net.activity.ScanCodeActivity;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 
 /**
@@ -93,7 +93,9 @@ public class LicenceDialog extends Dialog implements EventAdapter.EventCall{
             @Override
             public void onClick(View v) {
                 if (PermissionUtils.getInstance().hasPermission(mContext, Manifest.permission.CAMERA)) {
-                    mContext.startActivity(new Intent(mContext, ScanCodeActivity.class));
+                    Intent intent =  new Intent(mContext, ScanCodeActivity.class);
+                    intent.putExtra("type",1);
+                    mContext.startActivity(intent);
                 } else {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         ActivityCompat.requestPermissions((Activity) mContext,new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);

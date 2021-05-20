@@ -10,14 +10,13 @@ import android.widget.TextView;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 import com.doit.net.utils.BlackBoxManger;
 import com.doit.net.event.EventAdapter;
-import com.doit.net.utils.AccountManage;
 import com.doit.net.utils.UCSIDBManager;
 import com.doit.net.bean.UserInfo;
 import com.doit.net.utils.LoadingUtils;
 import com.doit.net.view.MySweetAlertDialog;
 import com.doit.net.utils.ToastUtils;
 import com.doit.net.view.ModifyUserInfoDialog;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.xutils.ex.DbException;
 
@@ -125,14 +124,14 @@ public class UserListAdapter extends BaseSwipeAdapter {
                             UserInfo resp = listUserInfo.get(position);
                             try {
                                 UCSIDBManager.getDbManager().delete(resp);
-                                if (AccountManage.UpdateAccountToDevice()){
-                                    EventAdapter.call(EventAdapter.REFRESH_USER_LIST);
-                                    EventAdapter.call(EventAdapter.ADD_BLACKBOX,BlackBoxManger.DELTE_USER+resp.getAccount());
-                                    LoadingUtils.loading(mContext);
-                                }else{
-                                    UCSIDBManager.getDbManager().save(resp);
-                                    ToastUtils.showMessageLong(R.string.del_user_fail_ftp_error);
-                                }
+//                                if (AccountManage.UpdateAccountToDevice()){
+//                                    EventAdapter.call(EventAdapter.REFRESH_USER_LIST);
+//                                    EventAdapter.call(EventAdapter.ADD_BLACKBOX,BlackBoxManger.DELTE_USER+resp.getAccount());
+//                                    LoadingUtils.loading(mContext);
+//                                }else{
+//                                    UCSIDBManager.getDbManager().save(resp);
+//                                    ToastUtils.showMessageLong(R.string.del_user_fail_ftp_error);
+//                                }
 
                             } catch (DbException e) {
                                 new SweetAlertDialog(mContext, SweetAlertDialog.ERROR_TYPE)

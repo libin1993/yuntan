@@ -34,7 +34,8 @@ public class EventAdapter {
     public final static String CHANGE_TAB = "CHANGE_TAB";
     public final static String UPDATE_WHITELIST = "UPDATE_WHITELIST";
     public final static String POWER_START = "POWER_START";
-    public final static String SCAN_CODE = "SCAN_CODE"; //扫码结果
+    public final static String SCAN_CODE = "SCAN_CODE"; //授权码扫码结果
+    public final static String SCAN_DEVICE_NO = "SCAN_DEVICE_NO"; //设备编号扫码结果
     public final static String GET_NAME_LIST = "GET_NAME_LIST"; //获取白名单
     public final static String GET_ACTIVE_MODE = "GET_ACTIVE_MODE"; //获取工作模式
     public final static String REFRESH_DEVICE = "REFRESH_DEVICE";  //通道设置

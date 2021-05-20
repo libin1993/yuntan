@@ -39,7 +39,7 @@ import com.doit.net.bean.WhiteListInfo;
 import com.doit.net.view.MySweetAlertDialog;
 import com.doit.net.utils.ToastUtils;
 import com.doit.net.utils.LogUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 //import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 //import org.apache.poi.ss.usermodel.Cell;

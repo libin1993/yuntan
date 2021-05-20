@@ -3,7 +3,7 @@ package com.doit.net.utils;
 import android.util.Log;
 
 import com.doit.net.event.EventAdapter;
-import com.doit.net.ucsi.BuildConfig;
+import com.doit.net.BuildConfig;
 
 import java.io.File;
 import java.io.FileOutputStream;

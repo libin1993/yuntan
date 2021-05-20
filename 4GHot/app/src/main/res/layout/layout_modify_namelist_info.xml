@@ -31,32 +31,10 @@
             android:gravity="center"
             android:layout_marginBottom="15dp"
             android:text="@string/title_modify_namelist"/>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal">
-
-            <TextView
-                style="@style/dialog_label"
-                android:layout_weight="1"
-                android:text="@string/lab_name" />
-
-            <EditText
-                android:id="@+id/etName"
-                style="@style/dialog_edit"
-                android:layout_weight="1"
-                android:singleLine="true"
-                android:layout_marginEnd="15dp"
-                android:maxLength="5"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:orientation="horizontal">
 
@@ -73,6 +51,27 @@
                 android:inputType="number"
                 android:maxLength="15"
                 android:layout_marginEnd="15dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                style="@style/dialog_label"
+                android:layout_weight="1"
+                android:text="手机号" />
+
+            <EditText
+                android:id="@+id/etName"
+                style="@style/dialog_edit"
+                android:layout_weight="1"
+                android:singleLine="true"
+                android:layout_marginEnd="15dp"
+                android:maxLength="11"/>
         </LinearLayout>
 
         <LinearLayout

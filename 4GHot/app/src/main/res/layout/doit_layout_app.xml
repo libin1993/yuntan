@@ -54,19 +54,19 @@
             android:id="@+id/rl_user_manage"
             android:layout_width="match_parent"
             android:layout_height="42dp"
-            app:isShowRightText="false"
+            app:isShowRightText="true"
             app:leftIcon="@drawable/account_manage"
-            app:leftText="@string/user_manege"
-            android:visibility="gone"
-            app:textColor="@color/white" />
+            app:leftText="设备编号"
+            app:textColor="@color/white"
+            app:rightIcon="@mipmap/ic_scan_white"
+            app:rightText=""/>
 
         <View
             android:id="@+id/view_user_manage"
             android:layout_width="match_parent"
             android:layout_height="0.6dp"
             android:layout_marginLeft="48dp"
-            android:background="@color/dimgrey"
-            android:visibility="gone"/>
+            android:background="@color/dimgrey"/>
 
 
         <com.doit.net.view.LSettingItem

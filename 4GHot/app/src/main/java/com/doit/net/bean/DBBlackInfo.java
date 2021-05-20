@@ -16,72 +16,52 @@ public class DBBlackInfo {
     @Column(name = "imsi")
     private String imsi;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "msisdn")
+    private String msisdn;
 
     @Column(name = "remark")
     private String remark;
 
-    @Column(name = "createDate")
-    private Date createDate;
-
-    public DBBlackInfo(String imsi, String name, String remark, Date createDate) {
+    public DBBlackInfo(String imsi, String msisdn, String remark) {
         this.imsi = imsi;
-        this.name = name;
+        this.msisdn = msisdn;
         this.remark = remark;
-        this.createDate = createDate;
     }
+
 
     public DBBlackInfo() {
-    }
-
-    private boolean isConn;
-
-    public boolean isConn() {
-        return isConn;
-    }
-
-    public void setConn(boolean conn) {
-        isConn = conn;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getImsi() {
         return imsi;
     }
-
-    public void setImsi(String imsi) {
-        this.imsi = imsi;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public String getMsisdn() {
+        return msisdn;
     }
 
     public String getRemark() {
         return remark;
     }
 
+    public void setImsi(String imsi) {
+        this.imsi = imsi;
+    }
+
+    public void setMsisdn(String msisdn) {
+        this.msisdn = msisdn;
+    }
+
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    @Override
+    public String toString() {
+        return "WhiteListInfo{" +
+                "id=" + id +
+                ", imsi='" + imsi + '\'' +
+                ", msisdn='" + msisdn + '\'' +
+                ", remark='" + remark + '\'' +
+                '}';
     }
 }

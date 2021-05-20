@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
-import com.doit.net.ucsi.BuildConfig;
+import com.doit.net.BuildConfig;
 
 /**
  * Created by Zxc on 2019/8/6.

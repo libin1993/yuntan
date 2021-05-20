@@ -33,7 +33,7 @@ import com.doit.net.utils.DateUtils;
 import com.doit.net.view.MySweetAlertDialog;
 import com.doit.net.view.MyCommonDialog;
 import com.doit.net.utils.ToastUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;

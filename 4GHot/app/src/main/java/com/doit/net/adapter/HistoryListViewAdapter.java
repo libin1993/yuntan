@@ -2,6 +2,7 @@ package com.doit.net.adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -10,16 +11,23 @@ import android.widget.TextView;
 
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
+import com.doit.net.bean.DBBlackInfo;
 import com.doit.net.event.AddToLocalBlackListener;
 import com.doit.net.event.AddToLocationListener;
+import com.doit.net.push.RequestUtils;
 import com.doit.net.utils.CacheManager;
 import com.doit.net.bean.DBUeidInfo;
+import com.doit.net.utils.NetWorkUtils;
+import com.doit.net.utils.SPUtils;
+import com.doit.net.utils.ToastUtils;
 import com.doit.net.utils.UCSIDBManager;
 import com.doit.net.utils.VersionManage;
 import com.doit.net.bean.WhiteListInfo;
+import com.doit.net.view.AddBlacklistDialog;
 import com.doit.net.view.AddWhitelistDialog;
+import com.doit.net.view.ModifyBlackListDialog;
 import com.doit.net.view.ModifyWhitelistDialog;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 import com.doit.net.utils.DateUtils;
 
 import org.xutils.DbManager;
@@ -32,8 +40,6 @@ public class HistoryListViewAdapter extends BaseSwipeAdapter {
 
     private DbManager dbManager;
     private Context mContext;
-//    private HistoryListViewAdapter.onItemLongClickListener mOnItemLongClickListener;
-    private MotionEvent motionEvent;
     private static List<DBUeidInfo> ueidList = new ArrayList<>();
 
     public HistoryListViewAdapter(Context mContext) {
@@ -57,24 +63,6 @@ public class HistoryListViewAdapter extends BaseSwipeAdapter {
     @Override
     public View generateView(final int position, ViewGroup parent) {
         View v = LayoutInflater.from(mContext).inflate(R.layout.doit_layout_ueid_list_item, null);
-        //动画
-//        SwipeLayout swipeLayout = (SwipeLayout)v.findViewById(getSwipeLayoutResourceId(position));
-
-//        swipeLayout.addSwipeListener(new SimpleSwipeListener() {
-//            @Override
-//            public void onOpen(SwipeLayout layout) {
-//                YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash));
-//            }
-//        });
-
-
-//        swipeLayout.setOnDoubleClickListener(new SwipeLayout.DoubleClickListener() {
-//            @Override
-//            public void onDoubleClick(SwipeLayout layout, boolean surface) {
-//                Toast.makeText(mContext, "DoubleClick", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
         return v;
     }
 
@@ -86,10 +74,17 @@ public class HistoryListViewAdapter extends BaseSwipeAdapter {
         TextView text_data = convertView.findViewById(R.id.tvUeidItemText);
         SwipeLayout swipeLayout = convertView.findViewById(R.id.layout_user_info);
         DBUeidInfo resp = ueidList.get(position);
-        text_data.setText("IMSI:"+resp.getImsi()+"\n"+mContext.getString(R.string.lab_rpt_time)+ DateUtils.convert2String(resp.getCreateDate(), DateUtils.LOCAL_DATE));
+        String content = "IMSI:"+resp.getImsi()+"\n";
+        if (!TextUtils.isEmpty(resp.getMsisdn())){
+            content += "手机号:"+resp.getMsisdn()+"\n";
+        }
+        content += mContext.getString(R.string.lab_rpt_time)+ DateUtils.convert2String(resp.getCreateDate(), DateUtils.LOCAL_DATE);
+        text_data.setText(content);
         text_data.setTag(position);
 
+
         if(VersionManage.isArmyVer()){
+            convertView.findViewById(R.id.iv_translate).setVisibility(View.GONE);
             convertView.findViewById(R.id.add_to_black).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -130,7 +125,66 @@ public class HistoryListViewAdapter extends BaseSwipeAdapter {
                 }
             });
         }else {
-            convertView.findViewById(R.id.add_to_black).setOnClickListener(new AddToLocalBlackListener(mContext,resp.getImsi()));
+            convertView.findViewById(R.id.add_to_black).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        DBBlackInfo info = dbManager.selector(DBBlackInfo.class).where("imsi", "=", resp.getImsi()).findFirst();
+                        if (info != null) {
+
+                            ModifyBlackListDialog modifyBlackListDialog = new ModifyBlackListDialog(mContext,
+                                    resp.getImsi(), info.getMsisdn(), info.getRemark(),false);
+                            modifyBlackListDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    notifyDataSetChanged();
+                                    if (swipeLayout !=null){
+                                        swipeLayout.close();
+                                    }
+                                }
+                            });
+                            modifyBlackListDialog.show();
+                        }else {
+                            AddBlacklistDialog addBlacklistDialog = new AddBlacklistDialog(mContext, resp.getImsi(),resp.getMsisdn());
+                            addBlacklistDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    notifyDataSetChanged();
+                                    if (swipeLayout !=null){
+                                        swipeLayout.close();
+                                    }
+                                }
+                            });
+                            addBlacklistDialog.show();
+                        }
+                    } catch (DbException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            convertView.findViewById(R.id.iv_translate).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!NetWorkUtils.getNetworkState()){
+                        ToastUtils.showMessage("请先连接设备WIFI，否则将无法使用");
+                        return;
+                    }
+
+                    if (TextUtils.isEmpty(SPUtils.getString(SPUtils.DEVICE_NO,""))){
+                        ToastUtils.showMessage("请先绑定设备");
+                        return;
+                    }
+
+                    RequestUtils.uploadIMSI(resp.getImsi());
+
+                    ToastUtils.showMessage("正在翻译...");
+
+                    if (swipeLayout !=null){
+                        swipeLayout.close();
+                    }
+                }
+            });
         }
 
         //if(BuildConfig.LOC_MODEL){
@@ -140,46 +194,8 @@ public class HistoryListViewAdapter extends BaseSwipeAdapter {
             convertView.findViewById(R.id.add_to_localtion).setVisibility(View.GONE);
         }
 
-//        if (mOnItemLongClickListener != null) {
-//            //获取触摸点的坐标，以决定pop从哪里弹出
-//            convertView.setOnTouchListener(new View.OnTouchListener() {
-//                @SuppressLint("ClickableViewAccessibility")
-//                @Override
-//                public boolean onTouch(View v, MotionEvent event) {
-//                    switch (event.getAction()) {
-//                        case MotionEvent.ACTION_DOWN:
-//                            motionEvent = event;
-//                            break;
-//                        default:
-//                            break;
-//                    }
-//                    // 如果onTouch返回false,首先是onTouch事件的down事件发生，此时，如果长按，触发onLongClick事件；
-//                    // 然后是onTouch事件的up事件发生，up完毕，最后触发onClick事件。
-//                    return false;
-//                }
-//            });
-//
-//
-//            final int pos = position;
-//            convertView.setOnLongClickListener(new View.OnLongClickListener() {
-//                @Override
-//                public boolean onLongClick(View v) {
-//                    //int position = holder.getLayoutPosition();
-//                    mOnItemLongClickListener.onItemLongClick(motionEvent, pos);
-//                    //返回true 表示消耗了事件 事件不会继续传递
-//                    return true; //长按了就禁止swipe弹出
-//                }
-//            });
-//        }
     }
 
-    public  List<DBUeidInfo> getUeidList(){
-        return ueidList;
-    }
-
-//    public void setOnItemLongClickListener(HistoryListViewAdapter.onItemLongClickListener mOnItemLongClickListener) {
-//        this.mOnItemLongClickListener = mOnItemLongClickListener;
-//    }
 
     @Override
     public int getCount() {

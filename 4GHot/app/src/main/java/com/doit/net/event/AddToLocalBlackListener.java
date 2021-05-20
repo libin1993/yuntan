@@ -5,7 +5,7 @@ import android.view.View;
 
 import com.doit.net.bean.DBBlackInfo;
 import com.doit.net.utils.UCSIDBManager;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 import com.doit.net.utils.ToastUtils;
 
 import org.xutils.DbManager;
@@ -47,10 +47,10 @@ public class AddToLocalBlackListener implements View.OnClickListener {
                 return;
             }
             DBBlackInfo info = new DBBlackInfo();
-            info.setCreateDate(new Date());
+//            info.setCreateDate(new Date());
             info.setRemark(remark);
             info.setImsi(imsi);
-            info.setName(name);
+//            info.setName(name);
             dbManager.save(info);
 
 //            if (CacheManager.isDeviceOk() && !CacheManager.getLocState()){

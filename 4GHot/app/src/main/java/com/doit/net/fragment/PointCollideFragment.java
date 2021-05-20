@@ -32,7 +32,7 @@ import com.doit.net.event.EventAdapter;
 import com.doit.net.utils.UCSIDBManager;
 import com.doit.net.utils.DateUtils;
 import com.doit.net.utils.ToastUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.xutils.DbManager;
 

@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.doit.net.adapter.UeidTabLayoutAdapter;
 import com.doit.net.base.BaseFragment;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import java.util.ArrayList;
 import java.util.List;

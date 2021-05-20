@@ -17,10 +17,9 @@ import com.doit.net.view.AddUserDialog;
 import com.doit.net.view.ModifyAdminAccountDialog;
 import com.doit.net.adapter.UserListAdapter;
 import com.doit.net.base.BaseActivity;
-import com.doit.net.utils.AccountManage;
 import com.doit.net.utils.UCSIDBManager;
 import com.doit.net.bean.UserInfo;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.xutils.ex.DbException;
 
@@ -88,28 +87,28 @@ public class UserManageActivity extends BaseActivity implements EventAdapter.Eve
     View.OnClickListener modifyAdminClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            ModifyAdminAccountDialog modifyAdminAccountDialog = new ModifyAdminAccountDialog(UserManageActivity.this,
-                    AccountManage.getAdminAcount(), AccountManage.getAdminPassword());
-            modifyAdminAccountDialog.show();
+//            ModifyAdminAccountDialog modifyAdminAccountDialog = new ModifyAdminAccountDialog(UserManageActivity.this,
+//                    AccountManage.getAdminAcount(), AccountManage.getAdminPassword());
+//            modifyAdminAccountDialog.show();
 
         }
     };
 
     void updateListFromDatabase(){
-        try {
-            listUserInfo = UCSIDBManager.getDbManager().selector(UserInfo.class)
-                    .where("remake","!=", AccountManage.getAdminRemark())
-                    .findAll();
-
-            if (listUserInfo == null) {
-                listUserInfo = new ArrayList<>();
-            }
-            mAdapter.setUserInfoList(listUserInfo);
-
-            mHandler.sendEmptyMessage(REFRESH_LIST);
-        } catch (DbException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            listUserInfo = UCSIDBManager.getDbManager().selector(UserInfo.class)
+//                    .where("remake","!=", AccountManage.getAdminRemark())
+//                    .findAll();
+//
+//            if (listUserInfo == null) {
+//                listUserInfo = new ArrayList<>();
+//            }
+//            mAdapter.setUserInfoList(listUserInfo);
+//
+//            mHandler.sendEmptyMessage(REFRESH_LIST);
+//        } catch (DbException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private void openSwipe(int position){

@@ -13,7 +13,7 @@ import com.doit.net.event.EventAdapter;
 import com.doit.net.protocol.LTESendManager;
 import com.doit.net.utils.CacheManager;
 import com.doit.net.view.MySweetAlertDialog;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 /**
  * Created by Zxc on 2019/12/17.

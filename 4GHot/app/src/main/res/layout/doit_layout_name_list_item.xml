@@ -24,10 +24,19 @@
             android:layout_height="60dp" />
 
         <ImageView
-            android:id="@+id/ivModify"
-            android:src="@drawable/ic_refresh_36dp"
+            android:id="@+id/iv_imsi_translate"
+            android:src="@drawable/ic_translate"
             android:layout_width="60dp"
             android:background="@color/royalblue"
+            android:paddingLeft="17dp"
+            android:paddingRight="17dp"
+            android:layout_height="60dp" />
+
+        <ImageView
+            android:id="@+id/ivModify"
+            android:src="@drawable/ic_edit"
+            android:layout_width="60dp"
+            android:background="@color/darkorange"
             android:paddingLeft="17dp"
             android:paddingRight="17dp"
             android:layout_height="60dp" />

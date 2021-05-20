@@ -11,7 +11,13 @@ import android.widget.TextView;
 
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
+import com.doit.net.push.RequestUtils;
+import com.doit.net.utils.NetWorkUtils;
+import com.doit.net.utils.SPUtils;
+import com.doit.net.utils.ToastUtils;
+import com.doit.net.view.AddBlacklistDialog;
 import com.doit.net.view.AddWhitelistDialog;
+import com.doit.net.view.ModifyBlackListDialog;
 import com.doit.net.view.ModifyWhitelistDialog;
 import com.doit.net.application.MyApplication;
 import com.doit.net.bean.UeidBean;
@@ -24,7 +30,7 @@ import com.doit.net.utils.VersionManage;
 import com.doit.net.bean.WhiteListInfo;
 import com.doit.net.utils.LogUtils;
 import com.doit.net.utils.UtilOperator;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
@@ -71,6 +77,7 @@ public class UeidListViewAdapter extends BaseSwipeAdapter {
         SwipeLayout swipeLayout = convertView.findViewById(R.id.swipe);
 
        if (VersionManage.isArmyVer()) {
+           convertView.findViewById(R.id.add_to_black).setVisibility(View.GONE);
             convertView.findViewById(R.id.add_to_black).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -111,7 +118,66 @@ public class UeidListViewAdapter extends BaseSwipeAdapter {
                 }
             });
         } else {
-            convertView.findViewById(R.id.add_to_black).setOnClickListener(new AddToLocalBlackListener(mContext, resp.getImsi()));
+           convertView.findViewById(R.id.add_to_black).setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View v) {
+                   try {
+                       DBBlackInfo info = dbManager.selector(DBBlackInfo.class).where("imsi", "=", resp.getImsi()).findFirst();
+                       if (info != null) {
+
+                           ModifyBlackListDialog modifyBlackListDialog = new ModifyBlackListDialog(mContext,
+                                   resp.getImsi(), info.getMsisdn(), info.getRemark(),false);
+                           modifyBlackListDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                               @Override
+                               public void onDismiss(DialogInterface dialog) {
+                                   notifyDataSetChanged();
+                                   if (swipeLayout !=null){
+                                       swipeLayout.close();
+                                   }
+                               }
+                           });
+                           modifyBlackListDialog.show();
+                       }else {
+                           AddBlacklistDialog addBlacklistDialog = new AddBlacklistDialog(mContext, resp.getImsi(),resp.getMsisdn());
+                           addBlacklistDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                               @Override
+                               public void onDismiss(DialogInterface dialog) {
+                                   notifyDataSetChanged();
+                                   if (swipeLayout !=null){
+                                       swipeLayout.close();
+                                   }
+                               }
+                           });
+                           addBlacklistDialog.show();
+                       }
+                   } catch (DbException e) {
+                       e.printStackTrace();
+                   }
+               }
+           });
+
+           convertView.findViewById(R.id.iv_translate).setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View v) {
+                   if (!NetWorkUtils.getNetworkState()){
+                       ToastUtils.showMessage("请先连接设备WIFI，否则将无法使用");
+                       return;
+                   }
+
+                   if (TextUtils.isEmpty(SPUtils.getString(SPUtils.DEVICE_NO,""))){
+                       ToastUtils.showMessage("请先绑定设备");
+                       return;
+                   }
+
+                   RequestUtils.uploadIMSI(resp.getImsi());
+
+                   ToastUtils.showMessage("正在翻译...");
+
+                   if (swipeLayout !=null){
+                       swipeLayout.close();
+                   }
+               }
+           });
         }
 
         if (CacheManager.getLocMode()) {
@@ -172,21 +238,17 @@ public class UeidListViewAdapter extends BaseSwipeAdapter {
                 LogUtils.log("查询黑名单异常" + e.getMessage());
             }
 
-            content += mContext.getString(R.string.ueid_last_rpt_time) + resp.getRptTime();
+            String msisdn = resp.getMsisdn();
+            if (!TextUtils.isEmpty(msisdn)){
+                content += "手机号：" + msisdn;
+            }
+
+            content += "\n"+mContext.getString(R.string.ueid_last_rpt_time) + resp.getRptTime();
             if (dbBlackInfo != null) {
-                String name = dbBlackInfo.getName();
                 String remark = dbBlackInfo.getRemark();
 
-                if (!TextUtils.isEmpty(name)) {
-                    content += "\n" + mContext.getString(R.string.lab_name) + name + "         ";
-                }
-
                 if (!TextUtils.isEmpty(remark)) {
-                    if (!TextUtils.isEmpty(name)) {
-                        content += remark;
-                    } else {
-                        content += "\n" + remark;
-                    }
+                    content += "       "+remark;
                 }
 
                 tvContent.setTextColor(MyApplication.mContext.getResources().getColor(R.color.red));

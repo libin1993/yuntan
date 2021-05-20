@@ -21,32 +21,11 @@
         android:layout_marginBottom="12dp"
         android:text="@string/modify_whitelist"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <TextView
-            style="@style/dialog_label"
-            android:text="@string/lab_msisdn" />
-
-        <EditText
-            android:id="@+id/etMsisdn"
-            style="@style/dialog_edit"
-            android:singleLine="true"
-            android:maxLength="11"
-            android:inputType="number"
-            android:textCursorDrawable="@null"
-            android:digits="@string/account_rule" />
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
         android:orientation="horizontal">
 
         <TextView
@@ -62,6 +41,29 @@
             android:textCursorDrawable="@null"
             android:digits="@string/account_rule" />
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            style="@style/dialog_label"
+            android:text="@string/lab_msisdn" />
+
+        <EditText
+            android:id="@+id/etMsisdn"
+            style="@style/dialog_edit"
+            android:singleLine="true"
+            android:maxLength="11"
+            android:inputType="number"
+            android:textCursorDrawable="@null"
+            android:digits="@string/account_rule" />
+    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -7,7 +7,7 @@ public class UeidBean {
     private String imsi;
     private String tmsi;
     private String band;
-    private String number;
+    private String msisdn;
     private String rptTime;
     private String longitude;
     private String latitude;
@@ -20,9 +20,9 @@ public class UeidBean {
 
     }
 
-    public UeidBean(String imsi, String number, String tmsi, String band, String rptTime, String longitude, String latitude) {
+    public UeidBean(String imsi, String msisdn, String tmsi, String band, String rptTime, String longitude, String latitude) {
         this.imsi = imsi;
-        this.number = number;
+        this.msisdn = msisdn;
         this.tmsi = tmsi;
         this.band = band;
         this.rptTime = rptTime;
@@ -34,8 +34,8 @@ public class UeidBean {
         return imsi;
     }
 
-    public String getNumber() {
-        return number;
+    public String getMsisdn() {
+        return msisdn;
     }
 
     public String getTmsi() {
@@ -61,8 +61,8 @@ public class UeidBean {
     public void setImsi(String imsi) {
         this.imsi = imsi;
     }
-    public void setNumber(String number) {
-        this.number = number;
+    public void setMsisdn(String msisdn) {
+        this.msisdn = msisdn;
     }
 
     public void setTmsi(String tmsi) {

@@ -11,13 +11,12 @@ import android.widget.EditText;
 
 import com.doit.net.utils.BlackBoxManger;
 import com.doit.net.event.EventAdapter;
-import com.doit.net.utils.AccountManage;
 import com.doit.net.utils.UCSIDBManager;
 import com.doit.net.bean.UserInfo;
 import com.doit.net.utils.FormatUtils;
 import com.doit.net.utils.LoadingUtils;
 import com.doit.net.utils.ToastUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
@@ -119,25 +118,25 @@ public class ModifyUserInfoDialog extends Dialog {
                 tmpUserInfo.setRemake(etRemake.getText().toString());
                 tmpUserInfo.setPassword(etPassword.getText().toString());
                 UCSIDBManager.getDbManager().update(tmpUserInfo);
-                if (AccountManage.UpdateAccountToDevice()){
-                    ToastUtils.showMessage(R.string.modify_user_success);
-
-                    EventAdapter.call(EventAdapter.ADD_BLACKBOX,BlackBoxManger.MODIFY_USER+"修改账户"+modifyName+
-                            "为:"+etUserName.getText().toString() + "+" + etPassword.getText().toString() +
-                            ("".equals(etRemake.getText().toString())?"":("+"+etRemake.getText().toString())));
-                    EventAdapter.call(EventAdapter.REFRESH_USER_LIST);
-                    LoadingUtils.loading(mContext);
-                }else{
-//                    tmpUserInfo.setAccount(modifyName);
-//                    tmpUserInfo.setRemake(modifyRemake);
-//                    tmpUserInfo.setPassword(modifyPassword);
-//                    UCSIDBManager.getDbManager().update(tmpUserInfo, "account", "password", "remake");
-
-                    new SweetAlertDialog(getContext(), SweetAlertDialog.ERROR_TYPE)
-                            .setTitleText(getContext().getString(R.string.modify_user_fail))
-                            .setContentText(getContext().getString(R.string.modify_user_fail_ftp))
-                            .show();
-                }
+//                if (AccountManage.UpdateAccountToDevice()){
+//                    ToastUtils.showMessage(R.string.modify_user_success);
+//
+//                    EventAdapter.call(EventAdapter.ADD_BLACKBOX,BlackBoxManger.MODIFY_USER+"修改账户"+modifyName+
+//                            "为:"+etUserName.getText().toString() + "+" + etPassword.getText().toString() +
+//                            ("".equals(etRemake.getText().toString())?"":("+"+etRemake.getText().toString())));
+//                    EventAdapter.call(EventAdapter.REFRESH_USER_LIST);
+//                    LoadingUtils.loading(mContext);
+//                }else{
+////                    tmpUserInfo.setAccount(modifyName);
+////                    tmpUserInfo.setRemake(modifyRemake);
+////                    tmpUserInfo.setPassword(modifyPassword);
+////                    UCSIDBManager.getDbManager().update(tmpUserInfo, "account", "password", "remake");
+//
+//                    new SweetAlertDialog(getContext(), SweetAlertDialog.ERROR_TYPE)
+//                            .setTitleText(getContext().getString(R.string.modify_user_fail))
+//                            .setContentText(getContext().getString(R.string.modify_user_fail_ftp))
+//                            .show();
+//                }
 
 
             } catch (DbException e) {

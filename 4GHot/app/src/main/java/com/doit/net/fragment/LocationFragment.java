@@ -23,7 +23,7 @@ import com.doit.net.utils.VersionManage;
 import com.doit.net.utils.Cellular;
 import com.doit.net.utils.LogUtils;
 import com.doit.net.utils.UtilOperator;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 import com.doit.net.utils.ToastUtils;
 
 import java.util.ArrayList;

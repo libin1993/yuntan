@@ -12,7 +12,7 @@ import com.doit.net.base.BaseActivity;
 import com.doit.net.event.EventAdapter;
 import com.doit.net.utils.LogUtils;
 import com.doit.net.utils.ScreenUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,13 +40,23 @@ public class ScanCodeActivity extends BaseActivity implements ScanCallback {
     ImageView ivScanBack;
 
 
+    //扫码类型  1：授权码  2：设备编号
+    private int type;
+
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Symbol.scanType = QrConfig.TYPE_CUSTOM;
         Symbol.doubleEngine = true;
         setContentView(R.layout.activity_scan_code);
+        getData();
         ButterKnife.bind(this);
+    }
+
+    private void getData() {
+        type = getIntent().getIntExtra("type", 0);
     }
 
     @Override
@@ -116,7 +126,12 @@ public class ScanCodeActivity extends BaseActivity implements ScanCallback {
     @Override
     public void onScanResult(cn.bertsir.zbar.Qr.ScanResult result) {
         LogUtils.log("扫描结果"+result.getContent());
-        EventAdapter.call(EventAdapter.SCAN_CODE,result.getContent());
+        if (type == 1){
+            EventAdapter.call(EventAdapter.SCAN_CODE,result.getContent());
+        }else if (type == 2){
+            EventAdapter.call(EventAdapter.SCAN_DEVICE_NO,result.getContent());
+        }
+
         vibrate();
         finish();
 

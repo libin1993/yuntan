@@ -7,58 +7,20 @@ import android.content.SharedPreferences;
  * Created by wiker on 2016/4/28.
  */
 public class SPUtils {
-    public static final String SHIELD_SWITCH_KEY = "SHIELD_SWITCH_KEY";
     public static final String DEVICE_IP = "DEVICE_IP"; //设备IP
     public static final String TOKEN = "TOKEN"; //登录Token
+    public static final String USERNAME = "USERNAME"; //用户名
+    public static final String PASSWORD = "PASSWORD"; //密码
+    public static final String REMEMBER_PASSWORD = "REMEMBER_PASSWORD"; //记住密码
+    public static final String USER_ID = "USER_ID"; //用户ID
+    public static final String DEVICE_NO = "DEVICE_NO"; //设备编号
+    public static final String LOC_PREF_KEY = "LOC_PREF_KEY"; //是否显示定位
+    public static final String SET_STATIC_IP = "STATIC_IP";  //静态IP
     private static SharedPreferences settings;
     private static SharedPreferences.Editor editor;
     public static void init(Context context){
         settings = context.getSharedPreferences("config", Context.MODE_PRIVATE);
         editor = settings.edit();
-    }
-
-    public static String getIp(){
-        return settings.getString("deviceIp","");
-    }
-
-    public static int getPort(){
-        return settings.getInt("devicePort",0);
-    }
-
-    public static void setIp(String ip){
-        editor.putString("deviceIp",ip);
-        editor.commit();
-    }
-    public static void setPort(int port){
-        editor.putInt("devicePort",port);
-        editor.commit();
-    }
-
-    public static int play_type = 0;
-    public static int getPlayType(){
-        play_type = settings.getInt("PlayType",0);
-        return play_type;
-    }
-
-    public static boolean supportPlay = false;
-
-    public static void setPlayType(int t){
-        if(1==1){
-            //去掉百度
-            return;
-        }
-        play_type = t;
-        editor.putInt("PlayType",t);
-        editor.commit();
-    }
-
-    public static String getImsi(){
-        return settings.getString("IMSI","");
-    }
-
-    public static void setImsi(String ip){
-        editor.putString("IMSI",ip);
-        editor.commit();
     }
 
     public static void setString(String key,String val){
@@ -97,13 +59,4 @@ public class SPUtils {
         editor.commit();
     }
 
-
-    public static String getToken(){
-        return settings.getString(TOKEN,"");
-    }
-
-    public static void setToken(String token){
-        editor.putString(TOKEN,token);
-        editor.commit();
-    }
 }

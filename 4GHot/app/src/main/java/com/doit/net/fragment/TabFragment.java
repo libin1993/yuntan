@@ -13,8 +13,7 @@ public class TabFragment extends Fragment
 {
 	private String mTitle = "Default";
 
-	public TabFragment()
-	{
+	public TabFragment(){
 	}
 
 	@Override

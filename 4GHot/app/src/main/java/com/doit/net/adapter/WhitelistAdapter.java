@@ -17,7 +17,7 @@ import com.doit.net.utils.UCSIDBManager;
 import com.doit.net.utils.LogUtils;
 import com.doit.net.view.MySweetAlertDialog;
 import com.doit.net.view.ModifyWhitelistDialog;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.xutils.ex.DbException;
 

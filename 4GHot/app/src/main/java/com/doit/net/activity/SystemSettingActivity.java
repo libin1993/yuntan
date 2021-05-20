@@ -14,7 +14,6 @@ import com.doit.net.event.EventAdapter;
 import com.doit.net.protocol.LTESendManager;
 import com.doit.net.utils.FileUtils;
 import com.doit.net.base.BaseActivity;
-import com.doit.net.utils.AccountManage;
 import com.doit.net.bean.LteChannelCfg;
 import com.doit.net.utils.CacheManager;
 import com.doit.net.utils.FTPManager;
@@ -22,7 +21,7 @@ import com.doit.net.utils.SPUtils;
 import com.doit.net.view.LSettingItem;
 import com.doit.net.view.MySweetAlertDialog;
 import com.doit.net.utils.ToastUtils;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -37,11 +36,9 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 import static cn.pedant.SweetAlert.SweetAlertDialog.WARNING_TYPE;
 
 public class SystemSettingActivity extends BaseActivity implements EventAdapter.EventCall {
-    public static String LOC_PREF_KEY = "LOC_PREF_KEY";
-    public static String SET_STATIC_IP = "STATIC_IP";
+
     private LSettingItem tvOnOffLocation;
     private LSettingItem tvIfAutoOpenRF;
-    private LSettingItem tvGeneralAdmin;
     private LSettingItem tvStaticIp;
 
     private BootstrapButton btSetFan;
@@ -70,9 +67,6 @@ public class SystemSettingActivity extends BaseActivity implements EventAdapter.
         tvIfAutoOpenRF.setOnLSettingCheckedChange(settingItemAutoRFSwitch);
         tvIfAutoOpenRF.setmOnLSettingItemClick(settingItemAutoRFSwitch);
 
-        tvGeneralAdmin = findViewById(R.id.tvGeneralAdmin);
-        tvGeneralAdmin.setmOnLSettingItemClick(generalAdminAccount);
-
         etMaxWindSpeed = findViewById(R.id.etMaxWindSpeed);
         etMinWindSpeed = findViewById(R.id.etMinWindSpeed);
         etTempThreshold = findViewById(R.id.etTempThreshold);
@@ -85,10 +79,10 @@ public class SystemSettingActivity extends BaseActivity implements EventAdapter.
         btRefresh = findViewById(R.id.btRefresh);
         btRefresh.setOnClickListener(refreshClickListener);
 
-        tvOnOffLocation.setChecked(SPUtils.getBoolean(LOC_PREF_KEY, true));
+        tvOnOffLocation.setChecked(SPUtils.getBoolean(SPUtils.LOC_PREF_KEY, true));
 
         tvStaticIp = findViewById(R.id.tv_static_ip);
-        tvStaticIp.setChecked(SPUtils.getBoolean(SET_STATIC_IP, true));
+        tvStaticIp.setChecked(SPUtils.getBoolean(SPUtils.SET_STATIC_IP, true));
         tvStaticIp.setOnLSettingCheckedChange(setStaticIpSwitch);
         tvStaticIp.setmOnLSettingItemClick(setStaticIpSwitch);
 
@@ -151,11 +145,7 @@ public class SystemSettingActivity extends BaseActivity implements EventAdapter.
     private LSettingItem.OnLSettingItemClick settingItemLocSwitch = new LSettingItem.OnLSettingItemClick() {
         @Override
         public void click(LSettingItem item) {
-            if (tvOnOffLocation.isChecked()) {
-                SPUtils.setBoolean(LOC_PREF_KEY, true);
-            } else {
-                SPUtils.setBoolean(LOC_PREF_KEY, false);
-            }
+            SPUtils.setBoolean(SPUtils.LOC_PREF_KEY, tvOnOffLocation.isChecked());
 
             ToastUtils.showMessage("设置成功，重新登陆生效。");
         }
@@ -179,69 +169,16 @@ public class SystemSettingActivity extends BaseActivity implements EventAdapter.
         @Override
         public void click(LSettingItem item) {
             if (tvStaticIp.isChecked()) {
-                SPUtils.setBoolean(SET_STATIC_IP, true);
+                SPUtils.setBoolean(SPUtils.SET_STATIC_IP, true);
                 ToastUtils.showMessage("已开启自动连接，无需配置WIFI静态IP，以后将自动连接设备");
             } else {
-                SPUtils.setBoolean(SET_STATIC_IP, false);
+                SPUtils.setBoolean(SPUtils.SET_STATIC_IP, false);
                 ToastUtils.showMessageLong("已关闭自动连接，请配置WIFI静态IP，否则将无法连接设备");
             }
 
 
         }
     };
-
-
-    private LSettingItem.OnLSettingItemClick generalAdminAccount = new LSettingItem.OnLSettingItemClick() {
-        @Override
-        public void click(LSettingItem item) {
-            generalAdmin();
-        }
-    };
-
-    private void generalAdmin() {
-        String accountFullPath = FileUtils.ROOT_PATH + "FtpAccount/";
-        String accountFileName = "account";
-
-
-        File namelistFile = new File(accountFullPath + accountFileName);
-        if (namelistFile.exists()) {
-            namelistFile.delete();
-        }
-
-        BufferedWriter bufferedWriter = null;
-        try {
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(accountFullPath + accountFileName, true)));
-            bufferedWriter.write("admin" + "," + "admin" + "," + AccountManage.getAdminRemark() + "\n");
-            bufferedWriter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (bufferedWriter != null) {
-                try {
-                    bufferedWriter.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        new Thread() {
-            public void run() {
-                try {
-                    FTPManager.getInstance().connect();
-                    if (FTPManager.getInstance().uploadFile(false, accountFullPath, accountFileName)) {
-                        ToastUtils.showMessage("生成管理员账号成功");
-                    } else {
-                        ToastUtils.showMessage("生成管理员账号出错");
-                    }
-                    AccountManage.deleteAccountFile();
-                } catch (Exception e) {
-                    ToastUtils.showMessage("生成管理员账号出错");
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
 
     View.OnClickListener setFanClickListener = new View.OnClickListener() {
         @Override

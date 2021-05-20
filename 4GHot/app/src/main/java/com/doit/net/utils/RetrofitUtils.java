@@ -49,7 +49,8 @@ public class RetrofitUtils {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(Api.HOST)
-                .build().create(Api.class);
+                .build()
+                .create(Api.class);
     }
 
     //获取单例
@@ -79,7 +80,7 @@ public class RetrofitUtils {
             public Response intercept(Chain chain) throws IOException {
                 Request request = chain.request()
                         .newBuilder()
-                        .addHeader("Authorization", SPUtils.getToken())
+                        .addHeader("Authorization", SPUtils.getString(SPUtils.TOKEN,""))
                         .addHeader("deviceType","Android")
                         .build();
                 return chain.proceed(request);

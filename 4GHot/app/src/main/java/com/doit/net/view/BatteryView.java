@@ -7,7 +7,7 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 /**
  * Author：Libin on 2020/6/30 11:20

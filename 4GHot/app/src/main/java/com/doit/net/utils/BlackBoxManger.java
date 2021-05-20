@@ -76,8 +76,6 @@ public class BlackBoxManger {
             return;
         }
 
-        if (AccountManage.getCurrentPerLevel() > AccountManage.PERMISSION_LEVEL2)
-            return;
 
         recordOprToFile(currentAccount, operation);
         LogUtils.log("黑匣子:"+currentAccount+"，"+operation);

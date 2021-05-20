@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 import com.doit.net.utils.CacheManager;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 /**
  * Created by wiker on 2016/4/29.

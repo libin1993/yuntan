@@ -23,7 +23,7 @@ import com.doit.net.view.AddFcnDialog;
 import com.doit.net.base.BaseActivity;
 import com.doit.net.bean.LteChannelCfg;
 import com.doit.net.bean.SectionBean;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.xutils.DbManager;
 import org.xutils.db.sqlite.WhereBuilder;

@@ -516,5 +516,15 @@ public class UserBean extends BaseBean<UserBean.DataBean> {
                 }
             }
         }
+
+        @Override
+        public String toString() {
+            return "DataBean{" +
+                    "router=" + router +
+                    ", perms=" + perms +
+                    ", user=" + user +
+                    ", token='" + token + '\'' +
+                    '}';
+        }
     }
 }

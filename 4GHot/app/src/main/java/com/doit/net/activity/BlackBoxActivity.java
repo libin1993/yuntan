@@ -25,7 +25,7 @@ import com.doit.net.view.MySweetAlertDialog;
 import com.doit.net.utils.ToastUtils;
 import com.doit.net.adapter.BlackBoxListAdapter;
 import com.doit.net.view.MyTimePickDialog;
-import com.doit.net.ucsi.R;
+import com.doit.net.R;
 
 import org.apache.commons.net.ftp.FTPFile;
 import org.xutils.DbManager;

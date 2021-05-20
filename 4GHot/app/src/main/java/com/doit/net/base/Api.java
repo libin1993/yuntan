@@ -10,6 +10,8 @@ import java.util.Map;
 
 import io.reactivex.Observable;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
@@ -29,7 +31,9 @@ import retrofit2.http.QueryMap;
  * Describe：接口
  */
 public interface Api {
-    String HOST = "http://183.214.181.133:3005/";         //ip、端口
+    String HOST = "http://183.214.181.133:3005/";         //云探
+    String PUSH_HOST = "http://183.214.181.133:3003";         //推送
+    String UPLOAD_HOST = "http://183.214.181.133:9093/";         //上传IMSI
 
     //登录
     @Headers({"Content-Type: application/json","Accept: application/json"})
@@ -49,7 +53,7 @@ public interface Api {
     //imsi上传
     @Headers({"Content-Type: application/json","Accept: application/json"})
     @POST("contentListener")
-    Observable<?> contentListener(@Body RequestBody body);
+    Call<ResponseBody> contentListener(@Body RequestBody body);
 
 
 }

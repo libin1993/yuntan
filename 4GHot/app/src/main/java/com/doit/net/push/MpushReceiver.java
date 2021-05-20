@@ -32,14 +32,13 @@ import android.os.SystemClock;
 
 import com.mpush.api.Constants;
 
-import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
 
 /**
  * Created by yxx on 2016/2/14.
  *
  * @author ohun@live.cn
  */
-public final class MPushReceiver extends BroadcastReceiver {
+public final class MpushReceiver extends BroadcastReceiver {
     public static final String ACTION_HEALTH_CHECK = "com.mpush.HEALTH_CHECK";
     public static final String ACTION_NOTIFY_CANCEL = "com.mpush.NOTIFY_CANCEL";
     public static int delay = Constants.DEF_HEARTBEAT;
@@ -48,57 +47,57 @@ public final class MPushReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        if (ACTION_HEALTH_CHECK.equals(action)) {//处理心跳
-            if (MPush.I.hasStarted()) {
-                if (MPush.I.client.isRunning()) {
-                    if (MPush.I.client.healthCheck()) {
+        //处理心跳
+        if (ACTION_HEALTH_CHECK.equals(action)) {
+            if (Mpush.showStart.hasStarted()) {
+                if (Mpush.showStart.client.isRunning()) {
+                    if (Mpush.showStart.client.healthCheck()) {
                         startAlarm(context, delay);
                     }
                 }
             }
-        } else if (CONNECTIVITY_ACTION.equals(action)) {//处理网络变化
+        } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
+            //处理网络变化
             if (hasNetwork(context)) {
                 if (STATE != State.CONNECTED) {
                     STATE = State.CONNECTED;
-                    if (MPush.I.hasStarted()) {
-                        MPush.I.onNetStateChange(true);
-
-                        //MPush.I.resumePush();
+                    if (Mpush.showStart.hasStarted()) {
+                        Mpush.showStart.onNetStateChange(true);
                     } else {
-                        MPush.I.checkInit(context).startPush();
+                        Mpush.showStart.checkInit(context).startPush();
                     }
                 }
             } else {
                 if (STATE != State.DISCONNECTED) {
                     STATE = State.DISCONNECTED;
-                    MPush.I.onNetStateChange(false);
-
-                    //MPush.I.pausePush();
-                    //cancelAlarm(context);//防止特殊场景下alarm没被取消
+                    Mpush.showStart.onNetStateChange(false);
                 }
             }
-        } else if (ACTION_NOTIFY_CANCEL.equals(action)) {//处理通知取消
-            Notifications.I.clean(intent);
+        } else if (ACTION_NOTIFY_CANCEL.equals(action)) {
+            //处理通知取消
         }
     }
 
     static void startAlarm(Context context, int delay) {
-        Intent it = new Intent(MPushReceiver.ACTION_HEALTH_CHECK);
+        Intent it = new Intent(MpushReceiver.ACTION_HEALTH_CHECK);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, it, 0);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        assert am != null;
         am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + delay, pi);
-        MPushReceiver.delay = delay;
+        MpushReceiver.delay = delay;
     }
 
     static void cancelAlarm(Context context) {
-        Intent it = new Intent(MPushReceiver.ACTION_HEALTH_CHECK);
+        Intent it = new Intent(MpushReceiver.ACTION_HEALTH_CHECK);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, it, 0);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        assert am != null;
         am.cancel(pi);
     }
 
     public static boolean hasNetwork(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert cm != null;
         NetworkInfo info = cm.getActiveNetworkInfo();
         return (info != null && info.isConnected());
     }
