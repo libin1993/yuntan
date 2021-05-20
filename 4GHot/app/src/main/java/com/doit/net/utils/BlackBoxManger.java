@@ -61,13 +61,10 @@ public class BlackBoxManger {
     public final static String MODIFY_ADMIN_ACCOUNT = "修改了管理员账户为:";
     public final static String EXPORT_BLACKBOX = "导出黑匣子信息，文件为:";
 
-    private static String currentAccount = "";
+    public static String currentAccount = "";
     public static final String LOCAL_FTP_BLX_PATH = FileUtils.ROOT_PATH+"FtpBlx/";
     public static String currentBlxFileName;
 
-    public static void setCurrentAccount(String account){
-        currentAccount = account;
-    }
 
     public static void recordOperation(String operation){
         //不对超级账户做记录

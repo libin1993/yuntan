@@ -205,6 +205,7 @@ public class MainActivity extends BaseActivity implements TextToSpeech.OnInitLis
         if (VersionManage.isArmyVer()) {
             return;
         }
+        BlackBoxManger.currentAccount = SPUtils.getString(SPUtils.USERNAME,"");
         BlackBoxManger.initBlx();
         BlackBoxManger.recordOperation(BlackBoxManger.LOGIN + SPUtils.getString(SPUtils.USERNAME, ""));
     }
