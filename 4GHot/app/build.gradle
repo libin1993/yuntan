@@ -9,9 +9,9 @@ android {
 
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 2023
+        versionCode 2024
         useLibrary 'org.apache.http.legacy'
-        versionName 'v1.3.7'
+        versionName 'v1.3.8'
         multiDexEnabled true
         flavorDimensions "versionCode"
         compileOptions {
@@ -39,9 +39,9 @@ android {
                         def fileName
                         if (outputFile != null && outputFile.name.endsWith('.apk')) {
                             if (variant.buildType.name.equals('release')) {
-                                fileName = "lte-hotspot-${versionName}-${"release"}.apk"
+                                fileName = "云探${versionName}.apk"
                             } else if (variant.buildType.name.equals('debug')) {
-                                fileName = "lte-hotspot-${versionName}-${"debug"}.apk"
+                                fileName = "云探${versionName}.apk"
                             }
                             outputFileName = fileName
                         }
@@ -110,7 +110,7 @@ android {
             applicationId 'com.synway.lte.hotspot'
             targetSdkVersion 28
             versionCode android.defaultConfig.versionCode
-            versionName android.defaultConfig.versionName + "P"
+            versionName android.defaultConfig.versionName
             signingConfig signingConfigs.relealse
             buildConfigField "boolean", "SPLASH_SCREEN", "false"
             resValue("string", "app_name", "云探")

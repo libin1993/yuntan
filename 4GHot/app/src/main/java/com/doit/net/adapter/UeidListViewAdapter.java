@@ -48,7 +48,7 @@ public class UeidListViewAdapter extends BaseSwipeAdapter {
 
     @Override
     public int getSwipeLayoutResourceId(int position) {
-        return R.id.swipe;
+        return R.id.swipe2;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class UeidListViewAdapter extends BaseSwipeAdapter {
         TextView tvContent = convertView.findViewById(R.id.tvUeidItemText);
         UeidBean resp = CacheManager.realtimeUeidList.get(position);
 
-        SwipeLayout swipeLayout = convertView.findViewById(R.id.swipe);
+        SwipeLayout swipeLayout = convertView.findViewById(R.id.swipe2);
 
        if (VersionManage.isArmyVer()) {
            convertView.findViewById(R.id.add_to_black).setVisibility(View.GONE);

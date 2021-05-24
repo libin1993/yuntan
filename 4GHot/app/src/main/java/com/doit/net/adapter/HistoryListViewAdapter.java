@@ -57,7 +57,7 @@ public class HistoryListViewAdapter extends BaseSwipeAdapter {
 
     @Override
     public int getSwipeLayoutResourceId(int position) {
-        return R.id.swipe;
+        return R.id.swipe2;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class HistoryListViewAdapter extends BaseSwipeAdapter {
         index.setText((position + 1) + ".");
 
         TextView text_data = convertView.findViewById(R.id.tvUeidItemText);
-        SwipeLayout swipeLayout = convertView.findViewById(R.id.layout_user_info);
+        SwipeLayout swipeLayout = convertView.findViewById(R.id.swipe2);
         DBUeidInfo resp = ueidList.get(position);
         String content = "IMSI:"+resp.getImsi()+"\n";
         if (!TextUtils.isEmpty(resp.getMsisdn())){

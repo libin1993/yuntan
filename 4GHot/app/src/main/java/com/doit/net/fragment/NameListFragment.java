@@ -307,7 +307,7 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
                             for (DBBlackInfo info: dbBlackInfos) {
                                 bufferedWriter.write(info.getImsi()+",");
                                 bufferedWriter.write(info.getMsisdn()+",");
-                                bufferedWriter.write(StringUtils.defaultString(info.getRemark())+",");
+                                bufferedWriter.write(StringUtils.defaultString(info.getRemark()));
                                 bufferedWriter.write("\r\n");
                             }
                         }
@@ -452,7 +452,7 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
                                 continue;
                             }
 
-                            if (!TextUtils.isEmpty(msisdn) && (msisdn.length() != 11 || !isNumeric(msisdn)) ) {
+                            if (!TextUtils.isEmpty(msisdn) && msisdn.length() != 11) {
                                 msisdn = "";
                             }
 
@@ -502,7 +502,7 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
                                 continue;
                             }
 
-                            if (!TextUtils.isEmpty(msisdn) && (msisdn.length() != 11 || !isNumeric(msisdn)) ) {
+                            if (!TextUtils.isEmpty(msisdn) && msisdn.length() != 11) {
                                 msisdn = "";
                             }
 

@@ -45,7 +45,7 @@ public class LocNameListAdapter extends BaseSwipeAdapter {
 
     @Override
     public int getSwipeLayoutResourceId(int position) {
-        return R.id.swipe;
+        return R.id.swipe1;
     }
 
     class DeleteNameListener implements View.OnClickListener{
