@@ -18,6 +18,7 @@ import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.util.Attributes;
 import com.doit.net.adapter.UeidListViewAdapter;
 import com.doit.net.base.BaseFragment;
+import com.doit.net.bean.DBBlackInfo;
 import com.doit.net.bean.LteChannelCfg;
 import com.doit.net.bean.UeidBean;
 import com.doit.net.event.EventAdapter;
@@ -32,6 +33,8 @@ import com.doit.net.utils.ToastUtils;
 import com.doit.net.utils.LogUtils;
 import com.doit.net.utils.UtilOperator;
 import com.doit.net.R;
+
+import org.xutils.ex.DbException;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -250,12 +253,28 @@ public class RealTimeUeidRptFragment extends BaseFragment implements EventAdapte
                     addShildRptList(listUeid);
 
                     if (new Date().getTime() - lastSortTime >= 3000) {
-                        Collections.sort(CacheManager.realtimeUeidList, new Comparator<UeidBean>() {
-                            public int compare(UeidBean o1, UeidBean o2) {
-                                return (int) (DateUtils.convert2long(o2.getRptTime(),DateUtils.LOCAL_DATE) -
-                                        DateUtils.convert2long(o1.getRptTime(),DateUtils.LOCAL_DATE));
-                            }
-                        });
+                        try {
+                            Collections.sort(CacheManager.realtimeUeidList, new Comparator<UeidBean>() {
+                                public int compare(UeidBean o1, UeidBean o2) {
+                                    try {
+                                        DBBlackInfo info1 = UCSIDBManager.getDbManager().selector(DBBlackInfo.class).where("imsi", "=", o1.getImsi()).findFirst();
+                                        DBBlackInfo info2 = UCSIDBManager.getDbManager().selector(DBBlackInfo.class).where("imsi", "=", o2.getImsi()).findFirst();
+                                        if (info1 != null){
+                                            return -1;
+                                        }else if (info2 !=null){
+                                            return 1;
+                                        }
+                                    } catch (DbException e) {
+                                        e.printStackTrace();
+                                    }
+                                    return (int) (DateUtils.convert2long(o2.getRptTime(),DateUtils.LOCAL_DATE) -
+                                            DateUtils.convert2long(o1.getRptTime(),DateUtils.LOCAL_DATE));
+                                }
+                            });
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+
 
                         lastSortTime = new Date().getTime();
                     }

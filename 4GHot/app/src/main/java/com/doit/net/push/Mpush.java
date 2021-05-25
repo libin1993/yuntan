@@ -60,7 +60,7 @@ public final class Mpush {
     public static Mpush showStart = showStart();
     private Context ctx;
     private ClientConfig clientConfig;
-    private  SharedPreferences sp;
+//    private  SharedPreferences sp;
     /*package*/ Client client;
 
     /**
@@ -86,7 +86,7 @@ public final class Mpush {
      */
     private void init(Context context) {
         ctx = context.getApplicationContext();
-        sp = ctx.getSharedPreferences(SP_FILE_NAME, Context.MODE_PRIVATE);
+//        sp = ctx.getSharedPreferences(SP_FILE_NAME, Context.MODE_PRIVATE);
     }
 
     /**
@@ -134,26 +134,27 @@ public final class Mpush {
      * @param clientConfig
      */
     public void setClientConfig(ClientConfig clientConfig) {
-        if (clientConfig.getPublicKey() == null
-                || clientConfig.getAllotServer() == null
-                || clientConfig.getClientVersion() == null || sp == null) {
-            throw new IllegalArgumentException("publicKey, allocServer can not be null");
-        }
 
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putString(SP_KEY_CV, clientConfig.getClientVersion())
-                .putString(SP_KEY_DI, clientConfig.getDeviceId())
-                .putString(SP_KEY_PK, clientConfig.getPublicKey())
-                .putBoolean(SP_KEY_LG, clientConfig.isLogEnabled())
-                .putString(SP_KEY_AS, clientConfig.getAllotServer());
-        if (clientConfig.getUserId() != null) {
-            editor.putString(SP_KEY_AT, clientConfig.getUserId());
-        }
-
-        if (clientConfig.getTags() != null) {
-            editor.putString(SP_KEY_TG, clientConfig.getTags());
-        }
-        editor.apply();
+//        if (clientConfig.getPublicKey() == null
+//                || clientConfig.getAllotServer() == null
+//                || clientConfig.getClientVersion() == null || sp == null) {
+//            return;
+//        }
+//
+//        SharedPreferences.Editor editor = sp.edit();
+//        editor.putString(SP_KEY_CV, clientConfig.getClientVersion())
+//                .putString(SP_KEY_DI, clientConfig.getDeviceId())
+//                .putString(SP_KEY_PK, clientConfig.getPublicKey())
+//                .putBoolean(SP_KEY_LG, clientConfig.isLogEnabled())
+//                .putString(SP_KEY_AS, clientConfig.getAllotServer());
+//        if (clientConfig.getUserId() != null) {
+//            editor.putString(SP_KEY_AT, clientConfig.getUserId());
+//        }
+//
+//        if (clientConfig.getTags() != null) {
+//            editor.putString(SP_KEY_TG, clientConfig.getTags());
+//        }
+//        editor.apply();
         this.clientConfig = clientConfig;
     }
 
@@ -209,8 +210,8 @@ public final class Mpush {
      */
     public void bindAccount(String userId, String tags) {
         if (hasInit()) {
-            sp.edit().putString(SP_KEY_AT, userId).apply();
-            sp.edit().putString(SP_KEY_TG, tags).apply();
+//            sp.edit().putString(SP_KEY_AT, userId).apply();
+//            sp.edit().putString(SP_KEY_TG, tags).apply();
             if (hasStarted() && client.isRunning()) {
                 client.bindUser(userId, tags);
             } else if (clientConfig != null) {
@@ -224,7 +225,7 @@ public final class Mpush {
      */
     public void unbindAccount() {
         if (hasInit()) {
-            sp.edit().remove(SP_KEY_AT).apply();
+//            sp.edit().remove(SP_KEY_AT).apply();
             if (hasStarted() && client.isRunning()) {
                 client.unbindUser();
             } else {
@@ -294,54 +295,54 @@ public final class Mpush {
 
     @Nullable
     private ClientConfig getClientConfig() {
-        if (clientConfig == null && sp != null) {
-            String clientVersion = sp.getString(SP_KEY_CV, null);
-            String deviceId = sp.getString(SP_KEY_DI, null);
-            String publicKey = sp.getString(SP_KEY_PK, null);
-            String allocServer = sp.getString(SP_KEY_AS, null);
-            boolean logEnabled = sp.getBoolean(SP_KEY_LG, false);
-            clientConfig = ClientConfig.build()
-                    .setPublicKey(publicKey)
-                    .setAllotServer(allocServer)
-                    .setDeviceId(deviceId)
-                    .setOsName(Constants.DEF_OS_NAME)
-                    .setOsVersion(Build.VERSION.RELEASE)
-                    .setClientVersion(clientVersion)
-                    .setLogger(new MpushLog())
-                    .setLogEnabled(logEnabled);
-        }
-        if (clientConfig.getClientVersion() == null
-                || clientConfig.getPublicKey() == null
-                || clientConfig.getAllotServer() == null) {
-            return null;
-        }
-
-        if (clientConfig.getSessionStorageDir() == null) {
-            clientConfig.setSessionStorage(new SpSessionStorage(sp));
-        }
-
-        if (clientConfig.getOsVersion() == null) {
-            clientConfig.setOsVersion(Build.VERSION.RELEASE);
-        }
-
-        if (clientConfig.getUserId() == null) {
-            clientConfig.setUserId(sp.getString(SP_KEY_AT, null));
-        }
-
-        if (clientConfig.getTags() == null) {
-            clientConfig.setTags(sp.getString(SP_KEY_TG, null));
-        }
-
-        if (clientConfig.getLogger() instanceof DefaultLogger) {
-            clientConfig.setLogger(new MpushLog());
-        }
+//        if (clientConfig == null && sp != null) {
+//            String clientVersion = sp.getString(SP_KEY_CV, null);
+//            String deviceId = sp.getString(SP_KEY_DI, null);
+//            String publicKey = sp.getString(SP_KEY_PK, null);
+//            String allocServer = sp.getString(SP_KEY_AS, null);
+//            boolean logEnabled = sp.getBoolean(SP_KEY_LG, false);
+//            clientConfig = ClientConfig.build()
+//                    .setPublicKey(publicKey)
+//                    .setAllotServer(allocServer)
+//                    .setDeviceId(deviceId)
+//                    .setOsName(Constants.DEF_OS_NAME)
+//                    .setOsVersion(Build.VERSION.RELEASE)
+//                    .setClientVersion(clientVersion)
+//                    .setLogger(new MpushLog())
+//                    .setLogEnabled(logEnabled);
+//        }
+//        if (clientConfig.getClientVersion() == null
+//                || clientConfig.getPublicKey() == null
+//                || clientConfig.getAllotServer() == null) {
+//            return null;
+//        }
+//
+//        if (clientConfig.getSessionStorageDir() == null) {
+//            clientConfig.setSessionStorage(new SpSessionStorage(sp));
+//        }
+//
+//        if (clientConfig.getOsVersion() == null) {
+//            clientConfig.setOsVersion(Build.VERSION.RELEASE);
+//        }
+//
+//        if (clientConfig.getUserId() == null) {
+//            clientConfig.setUserId(sp.getString(SP_KEY_AT, null));
+//        }
+//
+//        if (clientConfig.getTags() == null) {
+//            clientConfig.setTags(sp.getString(SP_KEY_TG, null));
+//        }
+//
+//        if (clientConfig.getLogger() instanceof DefaultLogger) {
+//            clientConfig.setLogger(new MpushLog());
+//        }
         return clientConfig;
     }
 
     synchronized /*package*/ void create(ClientListener listener) {
-        ClientConfig config = this.getClientConfig();
-        if (config != null) {
-            this.client = config.setClientListener(listener).create();
+//        ClientConfig config = this.getClientConfig();
+        if (clientConfig != null) {
+            this.client = clientConfig.setClientListener(listener).create();
         }
     }
 
@@ -351,7 +352,7 @@ public final class Mpush {
         }
         showStart.client = null;
         showStart.clientConfig = null;
-        showStart.sp = null;
+//        showStart.sp = null;
         showStart.ctx = null;
     }
 }

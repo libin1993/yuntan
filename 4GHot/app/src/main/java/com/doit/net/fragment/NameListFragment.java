@@ -81,7 +81,6 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
     private Button btImportNamelist;
     private Button btExportNamelist;
     private Button btClearNamelist;
-    private DbManager dbManager;
 
     private static final String BLACKLIST_FILE_PATH_EXCEL = FileUtils.ROOT_PATH + "Blacklist.xls";
     private static final String BLACKLIST_FILE_PATH_TXT = FileUtils.ROOT_PATH + "Blacklist.txt";
@@ -108,7 +107,6 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
 
         View rootView = inflater.inflate(R.layout.doit_layout_name_list, container, false);
 
-        dbManager = UCSIDBManager.getDbManager();
         mListView = rootView.findViewById(R.id.listview);
         etSearchKeyword = rootView.findViewById(R.id.editText_keyword);
         btSearch = rootView.findViewById(R.id.button_search);
@@ -151,14 +149,14 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
 
     private void refreshNamelist() {
         try {
-            dbBlackInfos = dbManager.selector(DBBlackInfo.class).findAll();
+            dbBlackInfos = UCSIDBManager.getDbManager().selector(DBBlackInfo.class).findAll();
             if (dbBlackInfos == null) {
                 dbBlackInfos = new ArrayList<>();
             }
 
             blacklistAdapter.setUeidList(dbBlackInfos);
 
-        } catch (DbException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -182,7 +180,7 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
         public void onClick(View v) {
             String keyword = etSearchKeyword.getText().toString();
             try {
-                dbBlackInfos = dbManager.selector(DBBlackInfo.class)
+                dbBlackInfos = UCSIDBManager.getDbManager().selector(DBBlackInfo.class)
                         .where("imsi", "like", "%" + keyword + "%")
                         .or("msisdn", "like", "%" + keyword + "%")
                         .or("remark", "like", "%" + keyword + "%")
@@ -521,7 +519,7 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
                     }
 
 
-                    dbManager.save(listValidBlack);
+                    UCSIDBManager.getDbManager().save(listValidBlack);
 
                     Message message = new Message();
                     message.what = IMPORT_SUCCESS;
@@ -610,7 +608,7 @@ public class NameListFragment extends BaseFragment implements EventAdapter.Event
                         @Override
                         public void onClick(MySweetAlertDialog sweetAlertDialog) {
                             try {
-                                dbManager.delete(DBBlackInfo.class);
+                                UCSIDBManager.getDbManager().delete(DBBlackInfo.class);
                             } catch (DbException e) {
                                 e.printStackTrace();
                             }
